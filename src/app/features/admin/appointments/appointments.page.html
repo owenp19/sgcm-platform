@@ -1,0 +1,98 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Citas" [totalCount]="appointments.length + ' citas'">
+    <div class="admin-content-inner">
+
+      <!-- HERO -->
+      <section class="pg-hero">
+        <div class="pg-hero-text">
+          <span class="pg-eyebrow">Agenda de atención</span>
+          <h1 class="pg-title">Gestión de citas</h1>
+          <p class="pg-sub">Consulta, confirma y administra las citas programadas por los ciudadanos.</p>
+        </div>
+        <div class="pg-hero-chip">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <div>
+            <span class="pg-chip-value">{{ appointments.length }}</span>
+            <span class="pg-chip-label">citas cargadas</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTERS -->
+      <section class="pg-toolbar">
+        <div class="date-field">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <input type="date" [(ngModel)]="dateFilter" (change)="applyFilter()" />
+        </div>
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="applyFilter()">
+          <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </section>
+
+      <!-- LOADING -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="occre-spinner"></div>
+        <p>Cargando citas...</p>
+      </div>
+
+      <!-- ERROR -->
+      <div class="error-state" *ngIf="error && !isLoading">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <p>{{ error }}</p>
+        <button class="retry-btn" (click)="loadAppointments()">Reintentar</button>
+      </div>
+
+      <!-- TABLE -->
+      <ng-container *ngIf="!isLoading && !error">
+        <div class="data-card">
+          <table *ngIf="appointments.length">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Ciudadano</th>
+                <th>Servicio</th>
+                <th>Oficina</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estado</th>
+                <th class="actions-col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let appt of appointments">
+                <td class="tracking-cell">{{ appt.code }}</td>
+                <td>
+                  <div class="citizen-cell">
+                    <span class="citizen-name">{{ appt.citizenName }}</span>
+                    <span class="citizen-contact" *ngIf="appt.citizenEmail">{{ appt.citizenEmail }}</span>
+                  </div>
+                </td>
+                <td>{{ appt.serviceName }}</td>
+                <td class="office-cell">{{ appt.officeName }}</td>
+                <td class="size-cell">{{ appt.scheduledDate | date:'dd/MM/yyyy' }}</td>
+                <td class="size-cell">{{ appt.scheduledTime }}</td>
+                <td>
+                  <span class="status-badge {{ getStatusClass(appt.status) }}">
+                    {{ getStatusLabel(appt.status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="icon-btns" *ngIf="appt.status !== 'cancelada' && appt.status !== 'completada'">
+                    <button class="icon-btn icon-btn-danger" (click)="cancelAppointment(appt)" title="Cancelar cita">
+                      <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="empty-state" *ngIf="!appointments.length">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <p>No se encontraron citas</p>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </app-admin-layout>
+</ion-content>

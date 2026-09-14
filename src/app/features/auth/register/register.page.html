@@ -1,0 +1,173 @@
+<ion-content class="login-page" [fullscreen]="true">
+  <div class="status-space"></div>
+
+  <main class="login-wrapper">
+    <!-- BACK + BRAND -->
+    <section class="brand-section">
+      <button type="button" class="settings-back-btn" [attr.aria-label]="'register.aria_back' | translate" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <img src="assets/images/logo-occre.png" [attr.alt]="'welcome.alt_logo' | translate" class="brand-logo" />
+
+      <h1>{{ 'register.title' | translate }}</h1>
+      <p>{{ 'register.subtitle' | translate }}</p>
+    </section>
+
+    <!-- FORMULARIO REGISTER -->
+    <form class="login-form" (submit)="$event.preventDefault(); register()">
+      <ion-item lines="none" class="input-card">
+        <ion-icon name="person-outline" slot="start"></ion-icon>
+        <ion-input
+          type="text"
+          autocomplete="given-name"
+          [placeholder]="'register.firstname' | translate"
+          [value]="form.firstName"
+          (ionInput)="onInput('firstName', $event)"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-card">
+        <ion-icon name="person-outline" slot="start"></ion-icon>
+        <ion-input
+          type="text"
+          autocomplete="family-name"
+          [placeholder]="'register.lastname' | translate"
+          [value]="form.lastName"
+          (ionInput)="onInput('lastName', $event)"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-card">
+        <ion-icon name="card-outline" slot="start"></ion-icon>
+        <ion-select
+          interface="action-sheet"
+          [placeholder]="'register.doctype' | translate"
+          [value]="form.documentType"
+          (ionChange)="onDocumentTypeChange($event)"
+        >
+          <ion-select-option *ngFor="let item of documentTypes" [value]="item.value">
+            {{ item.label }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item lines="none" class="input-card">
+        <ion-icon name="card-outline" slot="start"></ion-icon>
+        <ion-input
+          type="text"
+          inputmode="numeric"
+          autocomplete="off"
+          [placeholder]="'register.docnumber' | translate"
+          [value]="form.documentNumber"
+          (ionInput)="onInput('documentNumber', $event)"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-card">
+        <ion-icon name="call-outline" slot="start"></ion-icon>
+        <ion-input
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          [placeholder]="'register.phone' | translate"
+          [value]="form.phone"
+          (ionInput)="onInput('phone', $event)"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-card">
+        <ion-icon name="mail-outline" slot="start"></ion-icon>
+        <ion-input
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          [placeholder]="'register.email' | translate"
+          [value]="form.email"
+          (ionInput)="onInput('email', $event)"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-card">
+        <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+        <ion-input
+          [type]="showPassword ? 'text' : 'password'"
+          autocomplete="new-password"
+          [placeholder]="'register.password' | translate"
+          [value]="form.password"
+          (ionInput)="onInput('password', $event)"
+        ></ion-input>
+
+        <ion-button fill="clear" slot="end" class="eye-btn" (click)="togglePasswordVisibility()">
+          <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none" class="input-card">
+        <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+        <ion-input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          autocomplete="new-password"
+          [placeholder]="'register.confirm' | translate"
+          [value]="form.confirmPassword"
+          (ionInput)="onInput('confirmPassword', $event)"
+        ></ion-input>
+
+        <ion-button fill="clear" slot="end" class="eye-btn" (click)="toggleConfirmPasswordVisibility()">
+          <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <p class="form-error" *ngIf="wasSubmitted && form.confirmPassword && !passwordsMatch">
+        {{ 'common.password_mismatch' | translate }}
+      </p>
+
+      <p class="form-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <label class="terms-box">
+        <ion-checkbox
+          [checked]="form.acceptTerms"
+          (ionChange)="onTermsChange($event)"
+        ></ion-checkbox>
+        <span>{{ 'register.accept' | translate }}</span>
+      </label>
+
+      <ion-button
+        expand="block"
+        class="login-btn"
+        [disabled]="!isFormValid || isSubmitting"
+        (click)="register()"
+      >
+        <ion-spinner *ngIf="isSubmitting" name="crescent"></ion-spinner>
+        <span *ngIf="!isSubmitting">{{ 'register.submit' | translate }}</span>
+      </ion-button>
+    </form>
+
+    <!-- FOOTER -->
+    <div class="divider">
+      <span></span>
+      <p>{{ 'register.haveaccount' | translate }}</p>
+      <span></span>
+    </div>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      class="register-btn"
+      (click)="goToLogin()"
+    >
+      {{ 'register.login' | translate }}
+    </ion-button>
+
+    <!-- AYUDA -->
+    <section class="help-section">
+      <ion-icon name="headset-outline"></ion-icon>
+      <div>
+        <h3>{{ 'common.help' | translate }}</h3>
+        <p>{{ 'common.contact' | translate }}</p>
+      </div>
+    </section>
+
+    <img src="assets/images/login_screen.png" alt="" class="bottom-decoration" />
+  </main>
+</ion-content>

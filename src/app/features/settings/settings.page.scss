@@ -1,0 +1,512 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+button {
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+ion-content.settings-page {
+  --background: var(--app-background);
+  --padding-bottom: 0;
+}
+
+.settings-screen {
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--app-background);
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.settings-header {
+  position: relative;
+  width: 100%;
+  padding: calc(env(safe-area-inset-top) + 14px) 20px 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  overflow: hidden;
+  background: var(--app-primary);
+}
+
+.settings-header::before,
+.settings-header::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.settings-header::before {
+  top: -70px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+}
+
+.settings-header::after {
+  bottom: -110px;
+  left: -70px;
+  width: 210px;
+  height: 210px;
+}
+
+.settings-back-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 14px);
+  left: 14px;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.settings-back-btn:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.settings-back-btn:active {
+  transform: scale(0.93);
+}
+
+.settings-back-btn ion-icon {
+  font-size: 24px;
+  color: inherit;
+}
+
+.settings-header-icon {
+  position: relative;
+  z-index: 1;
+  width: 62px;
+  height: 62px;
+  margin: 40px auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+}
+
+.settings-header-icon ion-icon {
+  font-size: 30px;
+  color: inherit;
+}
+
+.settings-kicker {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 8px;
+  display: block;
+  font-family: var(--app-font-text);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--app-secondary);
+}
+
+.settings-title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  max-width: min(calc(100% - 96px), 620px);
+  font-family: var(--app-font-title);
+  font-size: clamp(1.7rem, 6vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+  overflow-wrap: break-word;
+}
+
+/* =========================================================
+   CUERPO
+========================================================= */
+
+.settings-body {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: -30px auto 0;
+  padding: 0 16px calc(16px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.settings-group {
+  width: 100%;
+}
+
+.settings-group-title {
+  font-family: var(--app-font-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--app-text-soft);
+  margin: 0 0 10px;
+  padding: 0 6px;
+}
+
+.settings-group-inner {
+  width: 100%;
+  background: var(--occre-white);
+  border: 1px solid rgba(var(--app-dark-rgb), 0.07);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(var(--app-dark-rgb), 0.06);
+}
+
+/* Rows */
+
+.settings-row {
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: transparent;
+  border-bottom: 1px solid rgba(var(--app-dark-rgb), 0.06);
+  transition: background-color 160ms ease;
+}
+
+.settings-row:last-child {
+  border-bottom: 0;
+}
+
+.settings-group-inner > .settings-row:last-child {
+  border-bottom: 0;
+}
+
+.settings-row:hover {
+  background: rgba(var(--app-primary-rgb), 0.04);
+}
+
+.settings-row-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
+
+.settings-row-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+
+.settings-row-icon ion-icon {
+  font-size: 21px;
+  width: 21px;
+  height: 21px;
+  color: inherit;
+}
+
+.settings-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.settings-row-label {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--app-text);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-row-desc {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--app-text-soft);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-row-nav {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.settings-row-nav:hover {
+  background: var(--app-primary);
+  color: #ffffff;
+}
+
+.settings-row-nav:active {
+  transform: scale(0.92);
+}
+
+.settings-row-nav ion-icon {
+  font-size: 19px;
+  color: inherit;
+}
+
+.settings-toggle {
+  --handle-background: var(--app-text-soft);
+  --handle-background-checked: var(--occre-white);
+  --background: rgba(var(--app-dark-rgb), 0.14);
+  --background-checked: var(--app-primary);
+}
+
+/* Menús desplegables (idioma y color) */
+
+.settings-expand-menu {
+  border-bottom: 1px solid rgba(var(--app-dark-rgb), 0.06);
+  padding: 8px 12px;
+  display: grid;
+  gap: 8px;
+  background: rgba(var(--app-primary-rgb), 0.03);
+}
+
+.settings-expand-option {
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: var(--occre-white);
+  color: var(--app-text);
+  font-family: var(--app-font-text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(var(--app-dark-rgb), 0.04);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.settings-expand-option:hover {
+  background: rgba(var(--app-primary-rgb), 0.06);
+}
+
+.settings-expand-option.active {
+  border-color: rgba(var(--app-primary-rgb), 0.4);
+  background: var(--app-primary-soft);
+}
+
+.settings-expand-flag {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--app-primary);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.settings-expand-label {
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-expand-check {
+  font-size: 22px;
+  color: var(--app-primary);
+}
+
+.settings-color-swatch {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--app-dark-rgb), 0.1);
+}
+
+.settings-color-swatch.color-blue {
+  background: #1d72b5;
+}
+
+.settings-color-swatch.color-red {
+  background: #b51d1d;
+}
+
+.settings-color-swatch.color-yellow {
+  background: #c9a020;
+}
+
+.settings-sync-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(var(--app-primary-rgb), 0.08);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--app-primary);
+  border-bottom: 1px solid rgba(var(--app-dark-rgb), 0.05);
+}
+
+.settings-sync-info ion-icon {
+  font-size: 20px;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.settings-version-badge {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.settings-logout {
+  margin: 4px 0 0;
+}
+
+.settings-logout ion-icon {
+  font-size: 22px;
+}
+
+/* Servidor */
+
+.server-input-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --background: var(--app-surface);
+  --inner-padding-end: 0;
+  border-bottom: 1px solid rgba(var(--app-dark-rgb), 0.05);
+}
+
+.server-message {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--app-primary);
+}
+
+.server-actions {
+  padding: 10px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.server-save-btn {
+  --border-radius: 999px;
+  margin: 0;
+  --background: var(--app-primary);
+  --color: #ffffff;
+  --box-shadow: 0 10px 22px rgba(var(--app-primary-rgb), 0.28);
+}
+
+.server-reset-btn {
+  background: none;
+  border: none;
+  color: var(--app-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* =========================================================
+   RESPONSIVE / ACCESIBILIDAD
+========================================================= */
+
+@media (max-width: 380px) {
+  .settings-header {
+    padding-inline: 18px;
+  }
+
+  .settings-body {
+    padding-inline: 14px;
+  }
+
+  .settings-row {
+    padding-inline: 14px;
+  }
+}
+
+@media (min-width: 600px) {
+  .settings-body {
+    padding-inline: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-back-btn,
+  .settings-row,
+  .settings-row-nav,
+  .settings-expand-option {
+    transition: none;
+  }
+
+  .settings-sync-info ion-icon {
+    animation: none;
+  }
+}

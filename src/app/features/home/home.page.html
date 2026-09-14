@@ -1,0 +1,279 @@
+<ion-menu
+  menuId="home-menu"
+  contentId="home-main-content"
+  side="start"
+  type="overlay"
+  class="home-menu"
+>
+  <ion-content class="menu-content">
+    <aside class="side-menu">
+      <div class="menu-header">
+        <img
+          class="menu-brand"
+          [src]="brandImagePath"
+          alt="Logo OCCRE"
+        />
+
+        <button
+          type="button"
+          class="menu-close-button"
+          [attr.aria-label]="'menu.close' | translate"
+          (click)="closeMenu()"
+        >
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <p class="menu-eyebrow">{{ 'home.title' | translate }}</p>
+
+      <nav class="menu-nav" [attr.aria-label]="'menu.main' | translate">
+        <button
+          type="button"
+          class="menu-nav-item"
+          *ngFor="let option of menuOptions"
+          (click)="goTo(option.route)"
+        >
+          <span class="menu-nav-icon">
+            <ion-icon [name]="option.icon"></ion-icon>
+          </span>
+
+          <span class="menu-nav-label">{{ option.label }}</span>
+
+          <ion-icon name="chevron-forward-outline" class="menu-nav-chevron"></ion-icon>
+        </button>
+      </nav>
+    </aside>
+  </ion-content>
+</ion-menu>
+
+<ion-content
+  id="home-main-content"
+  [fullscreen]="true"
+  class="home-content"
+  scroll-y="true"
+>
+  <main class="home-page">
+    <section class="home-hero">
+      <header class="home-header">
+        <button
+          type="button"
+          class="menu-button"
+          [attr.aria-label]="'menu.open' | translate"
+          (click)="openMenu()"
+        >
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+
+        <div class="header-spacer" aria-hidden="true"></div>
+
+        <div class="header-actions">
+          <button
+            type="button"
+            class="notification-button"
+            [attr.aria-label]="'menu.notifications' | translate"
+            (click)="openNotifications()"
+          >
+            <ion-icon name="notifications-outline"></ion-icon>
+
+            <span
+              class="notification-badge"
+              *ngIf="notificationCount > 0"
+            >
+              {{ notificationCount }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="profile-button"
+            [attr.aria-label]="'menu.profile' | translate"
+            (click)="openProfile()"
+          >
+            <ng-container *ngIf="!profileImageUrl; else profilePhoto">
+              <span class="profile-initials">{{ userInitials }}</span>
+            </ng-container>
+
+            <ng-template #profilePhoto>
+              <img
+                loading="lazy"
+                class="profile-image"
+                [src]="profileImageUrl"
+                [attr.alt]="'menu.profile_photo' | translate"
+              />
+            </ng-template>
+          </button>
+        </div>
+      </header>
+
+      <article class="hero-card">
+        <ng-container *ngFor="let slide of heroSlides; let index = index">
+          <img
+            loading="lazy"
+            class="hero-image"
+            [class.active]="index === activeSlideIndex"
+            [src]="slide.image"
+            [attr.fetchpriority]="index === 0 ? 'high' : 'auto'"
+            [alt]="slide.title"
+          />
+        </ng-container>
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-copy">
+          <p class="hero-eyebrow">
+            {{ activeSlide.kicker }}
+          </p>
+
+          <h2>
+            {{ activeSlide.title }}
+          </h2>
+
+          <p class="hero-description">
+            {{ activeSlide.description }}
+          </p>
+
+          <ion-button
+            class="explore-button"
+            type="button"
+            (click)="goToActiveSlideRoute()"
+          >
+            {{ activeSlide.actionLabel }}
+
+            <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        <div class="hero-indicators" [attr.aria-label]="'menu.carousel_indicator' | translate">
+          <button
+            type="button"
+            *ngFor="let slide of heroSlides; let index = index"
+            [class.active]="index === activeSlideIndex"
+            [attr.aria-label]="'menu.slide_aria' | translate:{n: (index + 1).toString()}"
+            (click)="selectSlide(index)"
+          ></button>
+        </div>
+      </article>
+    </section>
+
+    <section class="search-section">
+      <form class="search-box" role="search">
+        <ion-icon name="search-outline"></ion-icon>
+
+        <input
+          type="search"
+          name="homeSearch"
+          [(ngModel)]="searchTerm"
+          [placeholder]="'menu.procedures_search' | translate"
+          [attr.aria-label]="'menu.procedures_search_aria' | translate"
+          autocomplete="off"
+        />
+      </form>
+    </section>
+
+    <section class="home-body">
+      <div
+        class="update-banner"
+        *ngIf="updateAvailable"
+      >
+        <span class="update-banner-icon">
+          <ion-icon name="cloud-download-outline"></ion-icon>
+        </span>
+
+        <div class="update-banner-copy">
+          <p class="update-banner-title">{{ 'home.update_available' | translate }}</p>
+          <p class="update-banner-sub">{{ 'home.update_current' | translate }}: {{ appVersion }} → {{ latestVersion }}</p>
+        </div>
+
+        <button
+          type="button"
+          class="update-banner-action occre-btn occre-btn--link"
+          (click)="openAppStore()"
+        >
+          {{ 'home.update_link' | translate }}
+        </button>
+      </div>
+
+      <section class="home-section" aria-labelledby="occre-procedures-title">
+        <div class="section-header">
+          <div>
+            <p class="section-kicker">{{ 'home.catalog' | translate }}</p>
+            <h2 id="occre-procedures-title">{{ 'home.occre_procedures' | translate }}</h2>
+          </div>
+
+          <button
+            type="button"
+            class="see-all-button"
+            (click)="goTo('/procedures')"
+          >
+            <span>{{ 'common.view_all' | translate }}</span>
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </button>
+        </div>
+
+        <div class="procedures-grid">
+          <button
+            type="button"
+            class="procedure-card"
+            *ngFor="let procedure of filteredProcedures"
+            [ngClass]="procedure.colorClass"
+            (click)="goToProcedure(procedure)"
+          >
+            <span class="procedure-icon">
+              <ion-icon [name]="procedure.icon"></ion-icon>
+            </span>
+
+            <span class="procedure-copy">
+              <span class="procedure-category">
+                {{ procedure.category }}
+              </span>
+
+              <span class="procedure-title">
+                {{ procedure.title }}
+              </span>
+
+              <span class="procedure-desc">
+                {{ procedure.description }}
+              </span>
+            </span>
+
+            <span class="procedure-arrow">
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </span>
+          </button>
+
+          <div class="procedures-empty" *ngIf="searchTerm.trim() && filteredProcedures.length === 0">
+            <ion-icon name="search-outline"></ion-icon>
+            <p>{{ 'home.procedures_empty' | translate:{term: searchTerm} }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="data-protection-card" aria-label="Protección de datos">
+        <div class="data-protection-visual">
+          <div class="shield-icon">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+          </div>
+        </div>
+
+        <div class="data-protection-copy">
+          <p class="data-protection-kicker">{{ 'home.dataprotection' | translate }}</p>
+          <h2>{{ 'home.dataprotection_title' | translate }}</h2>
+          <p>{{ 'home.dataprotection_desc' | translate }}</p>
+        </div>
+
+        <button
+          type="button"
+          class="data-protection-button"
+          (click)="goTo('/data-protection')"
+        >
+          <span>{{ 'home.dataprotection_action' | translate }}</span>
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+        </button>
+      </section>
+
+      <div class="bottom-menu-end">
+        <app-bottom-menu active="home"></app-bottom-menu>
+      </div>
+    </section>
+  </main>
+</ion-content>

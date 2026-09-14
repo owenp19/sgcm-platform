@@ -1,0 +1,657 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+button {
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pd-page {
+  --background: var(--app-background);
+  --padding-bottom: 0;
+
+  color: var(--app-text);
+}
+
+.pd-screen {
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--app-background);
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.pd-header {
+  position: relative;
+  width: 100%;
+  padding: calc(env(safe-area-inset-top) + 14px) 20px 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  overflow: hidden;
+  background: var(--app-primary);
+}
+
+.pd-header::before,
+.pd-header::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.pd-header::before {
+  top: -70px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+}
+
+.pd-header::after {
+  bottom: -110px;
+  left: -70px;
+  width: 210px;
+  height: 210px;
+}
+
+.pd-back-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 14px);
+  left: 14px;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.pd-back-btn:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.pd-back-btn:active {
+  transform: scale(0.93);
+}
+
+.pd-back-btn ion-icon {
+  font-size: 24px;
+  color: inherit;
+}
+
+.pd-header-icon {
+  position: relative;
+  z-index: 1;
+  width: 60px;
+  height: 60px;
+  margin: 38px auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+}
+
+.pd-header-icon ion-icon {
+  font-size: 30px;
+  color: inherit;
+}
+
+.pd-kicker {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 8px;
+  display: block;
+  font-family: var(--app-font-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--app-secondary);
+}
+
+.pd-title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  max-width: min(calc(100% - 88px), 640px);
+  font-family: var(--app-font-title);
+  font-size: clamp(1.5rem, 5.5vw, 2.05rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+  overflow-wrap: break-word;
+}
+
+.pd-title--small {
+  font-size: clamp(1.25rem, 4.5vw, 1.6rem);
+}
+
+.pd-record {
+  position: relative;
+  z-index: 1;
+  margin-top: 8px;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.pd-badge {
+  position: relative;
+  z-index: 1;
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+}
+
+.pd-badge ion-icon {
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.status-submitted { background: #e3f2fd; color: #1565c0; }
+.status-review { background: #fff3e0; color: #e65100; }
+.status-observed { background: #fff8e1; color: #f57f17; }
+.status-approved { background: #e8f5e9; color: #2e7d32; }
+.status-rejected { background: #fbe9e7; color: #c62828; }
+.status-finished { background: #e8f5e9; color: #1b5e20; }
+.status-draft { background: #f3e5f5; color: #6a1b9a; }
+
+/* =========================================================
+   CUERPO
+========================================================= */
+
+.pd-body {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: -26px auto 0;
+  padding: 0 16px calc(24px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 16px;
+}
+
+.pd-card {
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--occre-white);
+  border: 1px solid rgba(var(--app-dark-rgb), 0.07);
+  box-shadow: 0 8px 30px rgba(var(--app-dark-rgb), 0.06);
+}
+
+.pd-card-title {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 14px;
+}
+
+.pd-card-title-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+
+.pd-card-title-icon ion-icon {
+  font-size: 20px;
+  color: inherit;
+}
+
+.pd-card-title h2 {
+  margin: 0;
+  font-family: var(--app-font-title);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--app-text);
+}
+
+/* Info */
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(var(--app-dark-rgb), 0.06);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-soft);
+}
+
+.info-value {
+  min-width: 0;
+  padding-left: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--app-text);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* Observaciones */
+
+.observations-text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--app-text);
+}
+
+/* Timeline */
+
+.timeline {
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 14px;
+  padding-bottom: 22px;
+  position: relative;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-marker {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.marker-dot {
+  position: relative;
+  z-index: 1;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--occre-white);
+  border: 3px solid var(--app-primary-border);
+  flex-shrink: 0;
+}
+
+.timeline-marker::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  width: 2px;
+  height: calc(100% - 18px);
+  background: var(--app-primary-border);
+}
+
+.timeline-item:last-child .timeline-marker::after,
+.timeline-marker.active::after {
+  display: block;
+}
+
+.timeline-item:last-child .timeline-marker::after {
+  display: none;
+}
+
+.timeline-marker.active .marker-dot {
+  border-color: var(--app-primary);
+  background: var(--app-primary);
+  box-shadow: 0 0 0 4px var(--app-primary-soft);
+}
+
+.timeline-content {
+  min-width: 0;
+  flex: 1;
+  padding-top: 1px;
+}
+
+.timeline-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.timeline-status-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+
+.timeline-status-icon ion-icon {
+  font-size: 15px;
+  color: inherit;
+}
+
+.timeline-status strong {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.timeline-desc {
+  margin: 0 0 5px;
+  font-size: 0.83rem;
+  line-height: 1.45;
+  color: var(--app-text-soft);
+}
+
+.timeline-meta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--app-text-soft);
+}
+
+.timeline-meta span + span {
+  margin-left: 4px;
+}
+
+/* Documentos */
+
+.document-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(var(--app-dark-rgb), 0.06);
+}
+
+.document-item:last-child {
+  border-bottom: none;
+}
+
+.doc-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+
+.doc-icon ion-icon {
+  font-size: 21px;
+  color: inherit;
+}
+
+.doc-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.doc-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--app-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-status {
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.doc-status.received {
+  background: rgba(46, 125, 50, 0.12);
+  color: #2e7d32;
+}
+
+.doc-status.pending {
+  background: rgba(230, 81, 0, 0.12);
+  color: #e65100;
+}
+
+.doc-action {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--app-surface);
+  color: var(--app-primary);
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.doc-action ion-icon {
+  font-size: 20px;
+}
+
+.doc-action:hover {
+  background: var(--app-primary);
+  color: #ffffff;
+}
+
+.doc-action:active {
+  transform: scale(0.93);
+}
+
+/* Citas */
+
+.appointment-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(var(--app-dark-rgb), 0.06);
+}
+
+.appointment-item:last-child {
+  border-bottom: none;
+}
+
+.apt-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+
+.apt-icon ion-icon {
+  font-size: 21px;
+  color: inherit;
+}
+
+.apt-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.apt-date {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.apt-office,
+.apt-status {
+  font-size: 0.76rem;
+  color: var(--app-text-soft);
+}
+
+.apt-code small {
+  font-size: 0.68rem;
+  color: var(--app-text-soft);
+  font-family: Consolas, 'Courier New', monospace;
+  white-space: nowrap;
+}
+
+/* Acciones */
+
+.actions-section {
+  display: grid;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.action-btn {
+  margin: 0;
+}
+
+.action-btn ion-icon {
+  font-size: 20px;
+}
+
+/* Estados */
+
+.loading-container {
+  padding: 16px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.skeleton-block {
+  background: var(--occre-white);
+  border-radius: 20px;
+  padding: 20px;
+  margin-top: 20px;
+  border: 1px solid rgba(var(--app-dark-rgb), 0.07);
+  box-shadow: 0 8px 30px rgba(var(--app-dark-rgb), 0.06);
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 60px 24px 90px;
+  text-align: center;
+}
+
+.error-state-icon {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(var(--app-secondary-rgb), 0.14);
+  color: var(--app-secondary);
+}
+
+.error-state-icon ion-icon {
+  font-size: 38px;
+  color: inherit;
+}
+
+.error-state p {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.error-state .occre-btn {
+  min-width: 200px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 380px) {
+  .pd-header {
+    padding-inline: 18px;
+  }
+
+  .pd-body {
+    padding-inline: 14px;
+  }
+}
+
+@media (min-width: 600px) {
+  .pd-body {
+    padding-inline: 20px;
+  }
+}
+
+@media (min-width: 640px) {
+  .info-row {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-back-btn,
+  .doc-action {
+    transition: none;
+  }
+}

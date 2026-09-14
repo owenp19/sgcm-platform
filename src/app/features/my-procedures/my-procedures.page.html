@@ -1,0 +1,128 @@
+<ion-content [fullscreen]="true" class="my-procedures-page">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <main class="my-procedures-screen">
+    <header class="my-procedures-header">
+      <button
+        type="button"
+        class="my-procedures-back-btn"
+        [attr.aria-label]="'common.back' | translate"
+        (click)="goBack()"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <span class="my-procedures-kicker">{{ 'my_procedures.kicker' | translate }}</span>
+      <h1 class="my-procedures-title">{{ 'my_procedures.title' | translate }}</h1>
+    </header>
+
+    <section class="my-procedures-body" aria-label="{{ 'my_procedures.title' | translate }}">
+    <!-- Summary cards -->
+    <section class="summary-row">
+      <div class="summary-card" *ngFor="let card of getSummaryCards()" [ngClass]="card.class">
+        <div class="summary-value">{{ card.value }}</div>
+        <div class="summary-label">
+          <ion-icon [name]="card.icon"></ion-icon>
+          <span>{{ card.label }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading skeleton -->
+    <ng-container *ngIf="isLoading">
+      <div class="skeleton-list">
+        <div class="skeleton-item" *ngFor="let _ of [1,2,3,4]">
+          <ion-skeleton-text animated style="height: 20px; width: 60%; margin-bottom: 8px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height: 14px; width: 40%; margin-bottom: 6px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height: 14px; width: 80%"></ion-skeleton-text>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Error state -->
+    <div class="error-box" *ngIf="errorMessage && !isLoading">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ errorMessage }}</p>
+      <ion-button fill="clear" shape="round" class="retry-btn" (click)="loadProcedures()">
+        <ion-icon name="reload-outline" slot="start"></ion-icon>
+        {{ 'my_procedures.retry' | translate }}
+      </ion-button>
+    </div>
+
+    <ng-container *ngIf="!isLoading && !errorMessage">
+      <!-- Filter chips -->
+      <section class="filter-row" *ngIf="procedures.length > 0">
+        <div class="filter-chips">
+          <button
+            type="button"
+            class="filter-chip"
+            *ngFor="let f of filters"
+            [class.active]="activeFilter === f.key"
+            (click)="setFilter(f.key)"
+          >
+            {{ f.label }}
+          </button>
+        </div>
+      </section>
+
+      <!-- Search bar -->
+      <section class="search-section" *ngIf="procedures.length > 0">
+        <ion-searchbar
+          [placeholder]="'my_procedures.search' | translate"
+          (ionInput)="onSearch($event)"
+        ></ion-searchbar>
+      </section>
+
+      <!-- Procedure list -->
+      <section class="list-section" *ngIf="filteredProcedures.length > 0; else emptyTpl">
+        <div
+          class="procedure-card"
+          *ngFor="let p of filteredProcedures"
+          (click)="goToDetail(p.id)"
+        >
+          <div class="card-top">
+            <div class="card-icon">
+              <ion-icon [name]="statusService.getStatusIcon(p.status)"></ion-icon>
+            </div>
+            <div class="card-info">
+              <h3>{{ p.procedure_name }}</h3>
+              <span class="card-record">{{ p.record_number }}</span>
+            </div>
+            <ion-icon name="chevron-forward-outline" class="card-arrow"></ion-icon>
+          </div>
+
+          <div class="card-body">
+            <div class="card-badge" [ngClass]="statusService.getStatusClass(p.status)">
+              <ion-icon [name]="statusService.getStatusIcon(p.status)"></ion-icon>
+              <span>{{ p.status_label }}</span>
+            </div>
+            <div class="card-meta">
+              <span class="meta-date">Radicado: {{ p.submitted_at | date:'dd/MM/yyyy' }}</span>
+              <span class="meta-update">Actualizado: {{ p.updated_at | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+
+          <div class="card-footer" *ngIf="p.next_step">
+            <span class="next-step">{{ p.next_step }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Empty state -->
+      <ng-template #emptyTpl>
+        <div class="empty-state">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <h3>{{ 'my_procedures.empty' | translate }}</h3>
+          <p>Cuando radiques una solicitud, podrás consultar aquí su estado y seguimiento.</p>
+          <ion-button class="start-btn" shape="round" (click)="goToNewProcedure()">
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            Iniciar trámite
+          </ion-button>
+        </div>
+      </ng-template>
+    </ng-container>
+    </section>
+  </main>
+</ion-content>

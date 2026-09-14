@@ -1,0 +1,209 @@
+<ion-content [fullscreen]="true" class="procedures-page">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- ===== HERO INSTITUCIONAL ===== -->
+  <section class="procedures-hero">
+    <div class="procedures-container procedures-hero-inner">
+      <div class="gov-bar">
+        <ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>
+        <span>{{ 'procedures.gov_label' | translate }}</span>
+      </div>
+
+      <span class="procedures-hero-icon">
+        <ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon>
+      </span>
+
+      <p class="page-kicker">{{ 'menu.procedures' | translate }}</p>
+      <h1>{{ 'procedures.title' | translate }}</h1>
+      <p class="page-subtitle">{{ 'procedures.subtitle' | translate }}</p>
+
+      <div class="search-field">
+        <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+        <input
+          type="search"
+          class="search-input"
+          [placeholder]="'procedures.search' | translate"
+          [attr.aria-label]="'procedures.search_aria' | translate"
+          [value]="searchQuery"
+          autocomplete="off"
+          (input)="onSearch($event)"
+        />
+        <button
+          *ngIf="searchQuery.trim()"
+          type="button"
+          class="search-clear"
+          [attr.aria-label]="'procedures.clear_search' | translate"
+          (click)="clearSearch()"
+        >
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <main class="procedures-body">
+    <div class="procedures-container">
+      <!-- ===== ACCESOS RÁPIDOS ===== -->
+      <section class="quick-actions" aria-label="Accesos rápidos">
+        <button
+          *ngFor="let action of quickActions"
+          type="button"
+          class="quick-action"
+          (click)="goToQuickAction(action)"
+        >
+          <span class="quick-action-icon" [ngClass]="action.accent">
+            <ion-icon [name]="action.icon" aria-hidden="true"></ion-icon>
+          </span>
+          <span class="quick-action-label">{{ action.key | translate }}</span>
+          <ion-icon name="chevron-forward-outline" class="quick-action-arrow" aria-hidden="true"></ion-icon>
+        </button>
+      </section>
+
+      <ng-container *ngIf="!isLoading; else loadingTpl">
+        <ng-container *ngIf="!error; else errorTpl">
+          <div class="toolbar-row">
+            <div class="filter-chips" role="tablist" [attr.aria-label]="'procedures.title' | translate">
+              <button
+                type="button"
+                class="filter-chip"
+                [class.active]="filter === 'all'"
+                role="tab"
+                [attr.aria-selected]="filter === 'all'"
+                (click)="setFilter('all')"
+              >
+                {{ 'procedures.all' | translate }}
+              </button>
+              <button
+                type="button"
+                class="filter-chip"
+                [class.active]="filter === 'fast'"
+                role="tab"
+                [attr.aria-selected]="filter === 'fast'"
+                (click)="setFilter('fast')"
+              >
+                <ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon>
+                {{ 'procedures.fast' | translate }}
+              </button>
+              <button
+                type="button"
+                class="filter-chip"
+                [class.active]="filter === 'long'"
+                role="tab"
+                [attr.aria-selected]="filter === 'long'"
+                (click)="setFilter('long')"
+              >
+                <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+                {{ 'procedures.long' | translate }}
+              </button>
+            </div>
+
+            <span class="results-count">
+              {{ 'procedures.results' | translate:{ count: filteredProcedures.length } }}
+            </span>
+          </div>
+
+          <ng-container *ngIf="filteredProcedures.length > 0; else emptyTpl">
+            <div class="procedures-grid">
+              <article
+                class="procedures-card"
+                *ngFor="let p of filteredProcedures; let index = index"
+                (click)="goToDetail(p.slug)"
+                (keydown.enter)="goToDetail(p.slug)"
+                tabindex="0"
+                role="button"
+              >
+                <div class="card-top">
+                  <span class="card-icon" [ngClass]="cardAccent(index)">
+                    <ion-icon [name]="cardIcon(index)" aria-hidden="true"></ion-icon>
+                  </span>
+
+                  <span class="card-arrow" aria-hidden="true">
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                  </span>
+                </div>
+
+                <div class="card-body">
+                  <p class="card-kicker">{{ 'procedures.kicker' | translate }}</p>
+                  <h3>{{ p.name }}</h3>
+                  <p class="card-desc">{{ p.description }}</p>
+
+                  <div class="card-meta">
+                    <span class="meta-chip">
+                      <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+                      {{ 'procedures.days' | translate:{ n: p.estimatedDays } }}
+                    </span>
+
+                    <span class="meta-chip meta-chip--cost" *ngIf="p.baseCost > 0">
+                      <ion-icon name="card-outline" aria-hidden="true"></ion-icon>
+                      {{ 'procedures.cost' | translate:{ n: p.baseCost.toLocaleString('es-CO') } }}
+                    </span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </ng-container>
+
+          <ng-template #emptyTpl>
+            <div class="state-block">
+              <span class="state-block-icon">
+                <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+              </span>
+              <h3>{{ 'procedures.empty_title' | translate }}</h3>
+              <p>{{ 'procedures.empty_desc' | translate }}</p>
+              <button
+                type="button"
+                class="occre-btn occre-btn--outline"
+                (click)="clearSearch()"
+              >
+                {{ 'procedures.clear_search' | translate }}
+              </button>
+            </div>
+          </ng-template>
+        </ng-container>
+
+        <ng-template #errorTpl>
+          <div class="state-block">
+            <span class="state-block-icon">
+              <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+            </span>
+            <h3>{{ 'common.error' | translate }}</h3>
+            <p>{{ error }}</p>
+            <button
+              type="button"
+              class="occre-btn occre-btn--primary"
+              (click)="loadProcedures()"
+            >
+              {{ 'procedures.retry' | translate }}
+            </button>
+          </div>
+        </ng-template>
+
+        <section class="help-strip">
+          <div class="help-strip-icon">
+            <ion-icon name="headset-outline" aria-hidden="true"></ion-icon>
+          </div>
+          <div class="help-copy">
+            <h3>{{ 'procedures.help_title' | translate }}</h3>
+            <p>{{ 'procedures.help_desc' | translate }}</p>
+          </div>
+          <button type="button" class="occre-btn occre-btn--dark help-action" (click)="goToHelp()">
+            {{ 'procedures.help_action' | translate }}
+          </button>
+        </section>
+      </ng-container>
+
+      <ng-template #loadingTpl>
+        <div class="skeleton-grid">
+          <div class="skeleton-card" *ngFor="let s of skeletonIndexes">
+            <span class="sk skeleton-icon"></span>
+            <span class="sk skeleton-line skeleton-line--short"></span>
+            <span class="sk skeleton-line"></span>
+            <span class="sk skeleton-line skeleton-line--medium"></span>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </main>
+</ion-content>

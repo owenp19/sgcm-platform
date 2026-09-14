@@ -1,0 +1,107 @@
+[
+    {
+        "title": "Contacto oficial OCCRE",
+        "content": "La OCCRE es la Oficina de Control, Circulación y Residencia del Archipiélago de San Andrés, Providencia y Santa Catalina. Los canales institucionales de contacto son: Avenida 20 de Julio, San Andrés Islas, Colombia; teléfono (608) 513 0801 extensión 413; correo occre@sanandres.gov.co. El sitio oficial es occre.gov.co.",
+        "source_label": "Contacto OCCRE",
+        "source_url": "https://occre.gov.co/contacto/"
+    },
+    {
+        "title": "Tarjeta de residencia OCCRE",
+        "content": "La tarjeta de residencia es el trámite orientado a residir de forma permanente en el Departamento Archipiélago de San Andrés, Providencia y Santa Catalina. En general se solicitan carta de solicitud, fotos 3x4, registro civil, documento de identidad y soportes adicionales según el tipo de solicitante. Los requisitos cambian si la persona es menor, mayor de edad, raizal, nacida o no nacida en el Archipiélago.",
+        "source_label": "Ventanilla San Andrés",
+        "source_url": "https://ventanilla.sanandres.gov.co/tramites/158/tarjeta-de-residencia/"
+    },
+    {
+        "title": "Primera tarjeta OCCRE",
+        "content": "Para la primera tarjeta OCCRE la información se diferencia según el caso: menor nacido en el Archipiélago, menor no nacido en el Archipiélago, solicitante raizal u otra condición. Usualmente se piden carta de solicitud, tarjeta de identidad, registro civil, copia de OCCRE y cédula de uno de los padres, y foto 3x4. La app permite agendar citas, radicar solicitudes y dar seguimiento a los trámites.",
+        "source_label": "Trámites OCCRE",
+        "source_url": "https://occre.gov.co/tramites/"
+    },
+    {
+        "title": "Duplicado de tarjeta OCCRE",
+        "content": "El duplicado de tarjeta OCCRE aplica cuando la tarjeta se pierde, se deteriora o requiere reposición. Usualmente se solicitan fotos 3x4 fondo azul, recibo de pago, fotocopia de cédula y carta de solicitud. Antes de radicar se debe verificar si se requiere denuncia, soporte adicional o pago actualizado.",
+        "source_label": "Duplicado de tarjeta",
+        "source_url": "https://ventanilla.sanandres.gov.co/tramites/127/duplicado-de-tarjeta-de-residencia/"
+    },
+    {
+        "title": "Cambio de tarjeta de identidad a cédula",
+        "content": "Para cambiar la tarjeta de residencia de menor de edad a mayoría de edad se debe revisar el trámite de actualización correspondiente. Generalmente se solicitan fotocopia de cédula, registro civil de nacimiento, tarjeta de residencia anterior o vencida y soportes según la condición del solicitante.",
+        "source_label": "Cambio de tarjeta",
+        "source_url": "https://ventanilla.sanandres.gov.co/tramites/125/cambio-tarjeta-de-residencia-de-menor-de-edad-a-mayoria-de-edad/"
+    },
+    {
+        "title": "Corrección de tarjeta OCCRE",
+        "content": "La corrección de tarjeta OCCRE aplica cuando se necesita modificar datos registrados, como información personal o tipo de residencia. Se deben reunir documentos que prueben la corrección solicitada y confirmar el procedimiento vigente con la OCCRE.",
+        "source_label": "Trámites OCCRE",
+        "source_url": "https://occre.gov.co/tramites/"
+    },
+    {
+        "title": "Tarjeta de turismo",
+        "content": "La tarjeta de turismo permite ingresar al Departamento Archipiélago en calidad de turista. El valor puede cambiar, por eso debe verificarse antes del pago en la ventanilla o canal oficial. En la app se diligencia en 4 pasos: datos personales, datos del viaje, hospedaje y resumen. Se deben revisar condiciones como pasaje de ida y regreso.",
+        "source_label": "Tarjeta de turismo",
+        "source_url": "https://ventanilla.sanandres.gov.co/tramites/160/tarjeta-de-turismo/"
+    },
+    {
+        "title": "Trabajador foráneo",
+        "content": "Para trabajador foráneo o tratamiento especial normalmente se revisan documentos de vinculación laboral, datos de la empresa contratante, identificación del trabajador y soportes del empleador. La empresa o contratante debe confirmar los requisitos vigentes antes de radicar la solicitud.",
+        "source_label": "Trabajador foráneo",
+        "source_url": "https://occre.gov.co/tramites-9/"
+    },
+    {
+        "title": "Residencia por convivencia",
+        "content": "La residencia por convivencia se relaciona con solicitudes donde existe un vínculo entre beneficiario y otorgante. Normalmente se deben aportar documentos que prueben la relación, la convivencia y la condición de la persona que otorga el beneficio.",
+        "source_label": "Trámites OCCRE",
+        "source_url": "https://occre.gov.co/tramites/"
+    },
+    {
+        "title": "Denuncias y quejas",
+        "content": "Para presentar una denuncia o reportar una posible irregularidad se deben usar los canales oficiales de la OCCRE. La denuncia debe incluir una descripción clara de los hechos, lugar, fecha aproximada y datos que permitan identificar o verificar la situación reportada.",
+        "source_label": "Contacto OCCRE",
+        "source_url": "https://occre.gov.co/contacto/"
+    },
+    {
+        "title": "Radicación de trámites en la app",
+        "content": "Para radicar un trámite se inicia sesión y se va a 'Nuevo trámite'. Se selecciona el tipo de procedimiento, se completa el formulario, se adjuntan los documentos solicitados en formato PDF o imagen y se envía la solicitud. El sistema entrega un número de radicado único para hacer seguimiento.",
+        "source_label": "Plataforma OCCRE"
+    },
+    {
+        "title": "Citas OCCRE",
+        "content": "Algunos trámites pueden requerir cita previa. Para agendar una cita se inicia sesión y se va a 'Agendar cita', se selecciona el tipo de servicio, una fecha y horario disponible, se completan los datos personales y se confirma. Se recibe un código único de cita. Las citas agendadas se ven en 'Mis citas' y se pueden cancelar desde allí.",
+        "source_label": "Plataforma OCCRE"
+    },
+    {
+        "title": "Pagos de trámites OCCRE",
+        "content": "Los pagos de trámites OCCRE se realizan a través de los canales oficiales habilitados: en línea por la ventanilla virtual o mediante consignaciones en bancos autorizados. El valor varía según el tipo de trámite. Se debe conservar el comprobante de pago para adjuntarlo a la solicitud.",
+        "source_label": "Ventanilla San Andrés",
+        "source_url": "https://ventanilla.sanandres.gov.co/"
+    },
+    {
+        "title": "Certificados y constancias",
+        "content": "Para solicitar un certificado de residencia o constancia de la OCCRE se presenta una solicitud formal indicando el tipo de certificado. Generalmente se requiere documento de identidad, número de radicado si hay un trámite en curso y el pago de los derechos correspondientes. Desde la app, los certificados se solicitan en la sección 'Certificados'.",
+        "source_label": "Ventanilla San Andrés",
+        "source_url": "https://ventanilla.sanandres.gov.co/"
+    },
+    {
+        "title": "Estado y seguimiento de trámites",
+        "content": "Para consultar el estado de un trámite se necesita el número de radicado o soporte de la solicitud. En la app se puede usar la opción 'Consultar radicado' ingresando el número de radicado y el documento. Si no hay radicado o se necesita una respuesta oficial se debe contactar directamente a la OCCRE.",
+        "source_label": "Plataforma OCCRE"
+    },
+    {
+        "title": "Horario de atención OCCRE",
+        "content": "El horario de atención puede variar según la dependencia o el trámite. Se recomienda consultar los canales oficiales de la Gobernación y de la OCCRE antes de asistir. Si se va a radicar documentos se debe llevar el soporte del trámite, la identificación y el número de radicado si ya existe una solicitud.",
+        "source_label": "Gobernación / OCCRE",
+        "source_url": "https://www.sanandres.gov.co/"
+    },
+    {
+        "title": "Protección de datos personales",
+        "content": "Los datos personales están protegidos conforme a la política de tratamiento de datos de la OCCRE y la legislación colombiana aplicable. La plataforma usa conexiones seguras y almacena la información de forma cifrada. El Aviso de Privacidad completo se consulta desde 'Configuración' o en la página de Protección de datos.",
+        "source_label": "Aviso de privacidad",
+        "source_url": "https://occre.gov.co/privacidad/"
+    },
+    {
+        "title": "Vehículos y circulación",
+        "content": "La OCCRE orienta sobre trámites de circulación para vehículos en el Archipiélago, que pueden incluir permisos de circulación temporal o permanente según la condición del propietario y el tipo de vehículo. Los requisitos varían y deben consultarse directamente con la OCCRE.",
+        "source_label": "Trámites OCCRE",
+        "source_url": "https://occre.gov.co/tramites/"
+    }
+]

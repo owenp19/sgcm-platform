@@ -1,0 +1,119 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Documentos" [totalCount]="totalDocs + ' documentos'">
+    <div class="admin-content-inner">
+
+      <!-- HERO -->
+      <section class="pg-hero">
+        <div class="pg-hero-text">
+          <span class="pg-eyebrow">Gestión documental</span>
+          <h1 class="pg-title">Documentos adjuntos</h1>
+          <p class="pg-sub">Consulta, valida y verifica los documentos que los ciudadanos cargan en sus trámites.</p>
+        </div>
+        <div class="pg-hero-chip">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <div>
+            <span class="pg-chip-value">{{ totalDocs }}</span>
+            <span class="pg-chip-label">documentos</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTERS -->
+      <section class="pg-toolbar">
+        <div class="search-field">
+          <ion-icon name="search-outline"></ion-icon>
+          <input type="text" placeholder="Buscar documentos, usuarios o radicados..." [(ngModel)]="searchTerm" (keyup.enter)="applyFilter()" />
+        </div>
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="applyFilter()">
+          <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </section>
+
+      <!-- LOADING -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="occre-spinner"></div>
+        <p>Cargando documentos...</p>
+      </div>
+
+      <!-- ERROR -->
+      <div class="error-state" *ngIf="error && !isLoading">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <p>{{ error }}</p>
+        <button class="retry-btn" (click)="loadDocuments()">Reintentar</button>
+      </div>
+
+      <!-- TABLE -->
+      <ng-container *ngIf="!isLoading && !error">
+        <div class="data-card">
+          <table *ngIf="documents.length">
+            <thead>
+              <tr>
+                <th>Documento</th>
+                <th>Usuario</th>
+                <th>Tipo</th>
+                <th>Tamaño</th>
+                <th>Radicado</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th class="actions-col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let doc of documents">
+                <td>
+                  <div class="doc-cell">
+                    <span class="doc-icon"><ion-icon name="document-outline"></ion-icon></span>
+                    <span class="doc-name">{{ doc.name }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="user-tag">{{ doc.userName }}</span>
+                </td>
+                <td><span class="badge badge-neutral">{{ doc.documentType }}</span></td>
+                <td class="size-cell">{{ formatFileSize(doc.size) }}</td>
+                <td class="tracking-cell">{{ doc.trackingNumber || '—' }}</td>
+                <td>
+                  <span class="status-badge" [class.status-validated]="doc.isValidated" [class.status-pending]="!doc.isValidated">
+                    {{ doc.isValidated ? 'Validado' : 'Pendiente' }}
+                  </span>
+                </td>
+                <td class="date-cell">{{ doc.createdAt | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <div class="icon-btns">
+                    <button class="icon-btn" (click)="openDocument(doc)" title="Ver documento">
+                      <ion-icon name="eye-outline"></ion-icon>
+                    </button>
+                    <button class="icon-btn icon-btn-success" *ngIf="!doc.isValidated" (click)="confirmValidate(doc, true)" title="Aprobar">
+                      <ion-icon name="checkmark-outline"></ion-icon>
+                    </button>
+                    <button class="icon-btn icon-btn-danger" *ngIf="!doc.isValidated" (click)="confirmValidate(doc, false)" title="Rechazar">
+                      <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="empty-state" *ngIf="!documents.length">
+            <ion-icon name="document-text-outline"></ion-icon>
+            <p>No se encontraron documentos</p>
+          </div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button class="pg-btn" [disabled]="currentPage === 1" (click)="loadDocuments(currentPage - 1)">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+            <span class="pg-btn-label">Anterior</span>
+          </button>
+          <span class="pg-info">Página {{ currentPage }} de {{ totalPages }}</span>
+          <button class="pg-btn" [disabled]="currentPage >= totalPages" (click)="loadDocuments(currentPage + 1)">
+            <span class="pg-btn-label">Siguiente</span>
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </app-admin-layout>
+</ion-content>

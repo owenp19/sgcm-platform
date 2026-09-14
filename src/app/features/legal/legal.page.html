@@ -1,0 +1,62 @@
+<ion-content [fullscreen]="true" class="legal-page">
+  <main class="legal-screen">
+    <header class="legal-header">
+      <button
+        type="button"
+        class="legal-back-btn"
+        aria-label="Volver atrás"
+        (click)="goBack()"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <span class="legal-kicker">{{ 'legal.kicker' | translate }}</span>
+      <h1 class="legal-title">{{ 'legal.title' | translate }}</h1>
+    </header>
+
+    <section class="legal-body" aria-label="Información legal y políticas">
+      <div class="legal-intro">
+        <div class="legal-intro-icon">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </div>
+        <div class="legal-intro-text">
+          <h2>{{ 'legal.intro_title' | translate }}</h2>
+          <p>
+            {{ 'legal.content' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <div class="legal-group">
+        <div
+          class="legal-section"
+          *ngFor="let section of sections"
+        >
+          <button
+            type="button"
+            class="legal-section-header"
+            (click)="toggleSection(section)"
+            [attr.aria-expanded]="section.open"
+          >
+            <ion-icon [name]="section.icon"></ion-icon>
+            <span>{{ section.title }}</span>
+            <ion-icon
+              [name]="section.open ? 'chevron-down-outline' : 'chevron-forward-outline'"
+            ></ion-icon>
+          </button>
+
+          <div
+            class="legal-section-body"
+            [class.open]="section.open"
+          >
+            <p>{{ section.content }}</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="legal-footer-text">
+        {{ 'legal.last_updated' | translate }} · 2026
+      </p>
+    </section>
+  </main>
+</ion-content>

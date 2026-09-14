@@ -1,0 +1,113 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Auditoría" [totalCount]="totalLogs + ' registros'">
+    <div topbar-actions>
+      <button class="topbar-btn export-btn" (click)="exportExcel()" title="Exportar a Excel" [disabled]="exportLoading">
+        <ion-icon name="document-outline"></ion-icon>
+      </button>
+      <button class="topbar-btn export-btn" (click)="exportPdf()" title="Exportar a PDF" [disabled]="exportLoading">
+        <ion-icon name="print-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="admin-content-inner">
+
+      <!-- HERO -->
+      <section class="pg-hero">
+        <div class="pg-hero-text">
+          <span class="pg-eyebrow">Trazabilidad del sistema</span>
+          <h1 class="pg-title">Registro de auditoría</h1>
+          <p class="pg-sub">Consulta todas las acciones realizadas por usuarios y el sistema, con filtros por fecha, acción y entidad.</p>
+        </div>
+        <div class="pg-hero-chip">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <div>
+            <span class="pg-chip-value">{{ totalLogs }}</span>
+            <span class="pg-chip-label">registros</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTERS -->
+      <section class="pg-toolbar audit-toolbar">
+        <div class="date-field">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <input type="date" [(ngModel)]="filterDateFrom" (change)="applyFilters()" />
+        </div>
+        <span class="toolbar-sep">a</span>
+        <div class="date-field">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <input type="date" [(ngModel)]="filterDateTo" (change)="applyFilters()" />
+        </div>
+        <select class="filter-select" [(ngModel)]="filterAction" (change)="applyFilters()">
+          <option *ngFor="let act of actionTypes" [value]="act.value">{{ act.label }}</option>
+        </select>
+        <select class="filter-select" [(ngModel)]="filterEntity" (change)="applyFilters()">
+          <option *ngFor="let ent of entityTypes" [value]="ent.value">{{ ent.label }}</option>
+        </select>
+        <button class="toolbar-btn toolbar-btn-primary" (click)="applyFilters()">Filtrar</button>
+        <button class="toolbar-btn" (click)="clearFilters()">Limpiar</button>
+      </section>
+
+      <!-- LOADING -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="occre-spinner"></div>
+        <p>Cargando auditoría...</p>
+      </div>
+
+      <!-- ERROR -->
+      <div class="error-state" *ngIf="error && !isLoading">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <p>{{ error }}</p>
+        <button class="retry-btn" (click)="loadLogs()">Reintentar</button>
+      </div>
+
+      <!-- TABLE -->
+      <ng-container *ngIf="!isLoading && !error">
+        <div class="data-card">
+          <table *ngIf="logs.length">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Entidad</th>
+                <th>ID Entidad</th>
+                <th>Detalles</th>
+                <th>IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let log of logs">
+                <td class="date-cell">{{ log.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ log.userName || '—' }}</td>
+                <td><span class="action-badge">{{ getActionLabel(log.action) }}</span></td>
+                <td>{{ getEntityLabel(log.entityType) }}</td>
+                <td class="entity-id-cell">{{ log.entityId || '—' }}</td>
+                <td class="details-cell" title="{{ formatDetails(log.details) }}">{{ formatDetails(log.details) }}</td>
+                <td class="ip-cell">{{ log.ipAddress || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="empty-state" *ngIf="!logs.length">
+            <ion-icon name="shield-outline"></ion-icon>
+            <p>No hay registros de auditoría</p>
+          </div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button class="pg-btn" [disabled]="currentPage === 1" (click)="loadLogs(currentPage - 1)">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+            <span class="pg-btn-label">Anterior</span>
+          </button>
+          <span class="pg-info">Página {{ currentPage }} de {{ totalPages }}</span>
+          <button class="pg-btn" [disabled]="currentPage >= totalPages" (click)="loadLogs(currentPage + 1)">
+            <span class="pg-btn-label">Siguiente</span>
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </app-admin-layout>
+</ion-content>

@@ -1,0 +1,478 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+button {
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+ion-content.my-procedures-page {
+  --background: var(--app-background);
+  --padding-bottom: 0;
+
+  color: var(--app-text);
+}
+
+.my-procedures-screen {
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--app-background);
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.my-procedures-header {
+  position: relative;
+  width: 100%;
+  padding: calc(env(safe-area-inset-top) + 18px) 20px 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  overflow: hidden;
+  background: var(--app-primary);
+}
+
+.my-procedures-header::after {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.my-procedures-back-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 14px);
+  left: 14px;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.my-procedures-back-btn:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.my-procedures-back-btn:active {
+  transform: scale(0.93);
+}
+
+.my-procedures-back-btn ion-icon {
+  font-size: 24px;
+  color: inherit;
+}
+
+.my-procedures-kicker {
+  position: relative;
+  z-index: 1;
+  margin: 44px 0 8px;
+  display: block;
+  font-family: var(--app-font-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--app-secondary);
+}
+
+.my-procedures-title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  max-width: min(100%, 560px);
+  font-family: var(--app-font-title);
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* =========================================================
+   CUERPO
+========================================================= */
+
+.my-procedures-body {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: -24px auto 0;
+  padding: 0 16px calc(16px + env(safe-area-inset-bottom));
+  overflow-x: hidden;
+}
+
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  background: var(--occre-white);
+  border-radius: 16px;
+  padding: 14px 12px;
+  text-align: center;
+  border: 1px solid var(--app-primary-border);
+  box-shadow: 0 2px 8px rgba(var(--app-dark-rgb), 0.04);
+
+  .summary-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--app-text);
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .summary-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    ion-icon {
+      font-size: 14px;
+    }
+
+    span {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--app-text-soft);
+    }
+  }
+
+  &.summary-review .summary-value { color: #e65100; }
+  &.summary-approved .summary-value { color: #2e7d32; }
+  &.summary-pending .summary-value { color: #1565c0; }
+  &.summary-observed .summary-value { color: #f57f17; }
+}
+
+.skeleton-list {
+  .skeleton-item {
+    background: var(--occre-white);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--app-primary-border);
+  }
+}
+
+.error-box {
+  text-align: center;
+  padding: 32px 16px;
+
+  ion-icon {
+    font-size: 40px;
+    color: #d32f2f;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--app-text);
+    margin: 0 0 12px;
+  }
+}
+
+.retry-btn {
+  --color: var(--app-primary);
+  font-weight: 600;
+  --border-radius: 50px;
+}
+
+.filter-row {
+  margin-bottom: 12px;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.filter-chip {
+  white-space: nowrap;
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--app-background);
+  color: var(--app-text-soft);
+  border: 1px solid var(--app-primary-border);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+
+  &.active {
+    background: var(--app-primary);
+    color: var(--app-primary-contrast);
+    border-color: var(--app-primary);
+  }
+}
+
+.search-section {
+  margin-bottom: 16px;
+
+  ion-searchbar {
+    --background: var(--app-background);
+    --border-radius: 50px;
+    --box-shadow: none;
+    --color: var(--app-text);
+    --placeholder-color: var(--app-text-soft);
+    --placeholder-opacity: 0.7;
+    --icon-color: var(--app-primary);
+    padding: 0;
+    border: 1px solid var(--app-primary-border);
+    border-radius: 50px;
+  }
+}
+
+.list-section {
+  margin-bottom: 24px;
+}
+
+.procedure-card {
+  background: var(--occre-white);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  border: 1px solid var(--app-primary-border);
+  box-shadow: 0 2px 12px rgba(var(--app-dark-rgb), 0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--app-primary-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 24px;
+      color: var(--app-primary);
+    }
+  }
+
+  .card-info {
+    flex: 1;
+    min-width: 0;
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--app-text);
+      margin: 0 0 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-record {
+      font-size: 12px;
+      color: var(--app-text-soft);
+      font-family: 'Courier New', monospace;
+    }
+  }
+
+  .card-arrow {
+    font-size: 18px;
+    color: var(--app-text-soft);
+    flex-shrink: 0;
+  }
+
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+
+    ion-icon { font-size: 14px; }
+
+    &.status-submitted { background: #e3f2fd; color: #1565c0; }
+    &.status-review { background: #fff3e0; color: #e65100; }
+    &.status-observed { background: #fff8e1; color: #f57f17; }
+    &.status-approved { background: #e8f5e9; color: #2e7d32; }
+    &.status-rejected { background: #fbe9e7; color: #c62828; }
+    &.status-finished { background: #e8f5e9; color: #1b5e20; }
+    &.status-draft { background: #f3e5f5; color: #6a1b9a; }
+  }
+
+  .card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+
+    .meta-date,
+    .meta-update {
+      font-size: 11px;
+      color: var(--app-text-soft);
+    }
+  }
+
+  .card-footer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--app-primary-border);
+
+    .next-step {
+      font-size: 12px;
+      color: var(--app-primary);
+      font-weight: 600;
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+
+  ion-icon {
+    font-size: 64px;
+    color: var(--app-text-soft);
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--app-text);
+    margin: 0 0 8px;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--app-text-soft);
+    margin: 0 0 24px;
+    line-height: 1.5;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.start-btn {
+  height: 50px;
+  --border-radius: 50px;
+  --background: var(--app-primary-gradient);
+  --box-shadow: 0 4px 12px rgba(var(--app-primary-rgb), 0.3);
+  text-transform: none;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* =========================================================
+ * RESPONSIVE MÓVIL PEQUEÑO
+ * ========================================================= */
+
+@media (max-width: 380px) {
+  .my-procedures-header {
+    padding-inline: 18px;
+  }
+
+  .my-procedures-body {
+    padding-inline: 14px;
+  }
+}
+
+/* =========================================================
+ * MOVIMIENTO REDUCIDO
+ * ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .my-procedures-back-btn,
+  .procedure-card {
+    transition: none;
+  }
+}
+
+/* =========================================================
+ * RESPONSIVE TABLET / DESKTOP
+ * ========================================================= */
+
+@media (min-width: 600px) {
+  .my-procedures-body {
+    padding-inline: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  .my-procedures-body {
+    max-width: min(100% - 48px, 820px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .list-section {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .procedure-card {
+    margin-bottom: 0;
+  }
+
+  .filter-chips {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}

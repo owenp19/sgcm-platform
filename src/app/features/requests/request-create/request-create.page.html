@@ -1,0 +1,176 @@
+<ion-content [fullscreen]="true" class="request-create-page">
+  <main class="rc-screen">
+    <!-- Success overlay -->
+    <div class="success-overlay" *ngIf="successData">
+      <div class="success-card">
+        <span class="success-icon">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </span>
+        <span class="success-kicker">{{ 'request_create.success' | translate }}</span>
+        <h2>{{ 'request_create.success' | translate }}</h2>
+
+        <div class="tracking-number-card">
+          <span class="tracking-label">Número de radicado</span>
+          <span class="tracking-value">{{ successData.trackingNumber }}</span>
+        </div>
+
+        <ion-button
+          expand="block"
+          shape="round"
+          class="success-btn"
+          (click)="goToTracking()"
+        >
+          <ion-icon name="search-outline" slot="start"></ion-icon>
+          Ver seguimiento
+        </ion-button>
+
+        <button type="button" class="success-secondary" (click)="goBack()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+          <span>Volver a trámites</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <ng-container *ngIf="!successData && isLoading">
+      <div class="rc-loading">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando información del trámite...</p>
+      </div>
+    </ng-container>
+
+    <!-- Error inicial (sin procedimiento) -->
+    <ng-container *ngIf="!successData && !isLoading && error && !procedure">
+      <div class="rc-error">
+        <span class="rc-error-icon">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+        </span>
+        <p>{{ error }}</p>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="!successData && !isLoading && procedure">
+      <header class="rc-header">
+        <button
+          type="button"
+          class="rc-back-btn"
+          aria-label="{{ 'common.back' | translate }}"
+          (click)="goBack()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+
+        <span class="rc-header-icon">
+          <ion-icon name="document-text-outline"></ion-icon>
+        </span>
+
+        <span class="rc-kicker">{{ 'request_create.title' | translate }}</span>
+        <h1 class="rc-title">{{ procedure.name }}</h1>
+
+        <span class="rc-meta" *ngIf="procedure.estimatedDays > 0">
+          <ion-icon name="time-outline"></ion-icon>
+          {{ procedure.estimatedDays }} días hábiles
+        </span>
+      </header>
+
+      <section class="rc-body">
+        <!-- Requisitos -->
+        <section class="rc-card" *ngIf="procedure.requirements.length > 0">
+          <div class="rc-card-title">
+            <span class="rc-card-title-icon">
+              <ion-icon name="checkmark-done-outline"></ion-icon>
+            </span>
+            <h2>{{ 'request_create.requirements' | translate }}</h2>
+          </div>
+
+          <ul class="rc-requirements">
+            <li *ngFor="let req of procedure.requirements">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span>{{ req }}</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Notas -->
+        <section class="rc-card">
+          <div class="rc-card-title">
+            <span class="rc-card-title-icon">
+              <ion-icon name="create-outline"></ion-icon>
+            </span>
+            <h2>{{ 'request_create.notes' | translate }}</h2>
+          </div>
+
+          <ion-textarea
+            [(ngModel)]="notes"
+            [placeholder]="'request_create.notes' | translate"
+            rows="4"
+            auto-grow
+            class="rc-textarea"
+            (ionInput)="onNotesChange()"
+          ></ion-textarea>
+
+          <div class="draft-indicator" *ngIf="draftSavedAt">
+            <ion-icon name="cloud-done-outline"></ion-icon>
+            <span>{{ 'request_create.draft_saved' | translate }}</span>
+          </div>
+        </section>
+
+        <!-- Documentos -->
+        <section class="rc-card">
+          <div class="rc-card-title">
+            <span class="rc-card-title-icon">
+              <ion-icon name="cloud-upload-outline"></ion-icon>
+            </span>
+            <h2>{{ 'request_create.upload_docs' | translate }}</h2>
+          </div>
+
+          <button
+            type="button"
+            class="occre-btn occre-btn--outline occre-btn--full rc-add-files"
+            (click)="addFile()"
+          >
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+            <span>{{ 'request_create.add_files' | translate }}</span>
+          </button>
+
+          <ul class="rc-file-list" *ngIf="selectedFiles.length > 0">
+            <li *ngFor="let item of selectedFiles; let i = index">
+              <span class="rc-file-icon">
+                <ion-icon name="document-outline"></ion-icon>
+              </span>
+              <span class="rc-file-name">{{ item.name }}</span>
+              <button
+                type="button"
+                class="rc-file-remove"
+                aria-label="Quitar archivo"
+                (click)="removeFile(i)"
+              >
+                <ion-icon name="close-outline"></ion-icon>
+              </button>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Error de envío -->
+        <div class="rc-submit-error" *ngIf="error">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ error }}</span>
+        </div>
+
+        <!-- Enviar -->
+        <button
+          type="button"
+          class="occre-btn occre-btn--primary occre-btn--full rc-submit"
+          [disabled]="isSubmitting"
+          (click)="submitRequest()"
+        >
+          <ion-spinner *ngIf="isSubmitting" name="crescent"></ion-spinner>
+          <ng-container *ngIf="!isSubmitting">
+            <ion-icon name="send-outline"></ion-icon>
+            <span>{{ 'request_create.submit' | translate }}</span>
+          </ng-container>
+        </button>
+      </section>
+    </ng-container>
+  </main>
+</ion-content>

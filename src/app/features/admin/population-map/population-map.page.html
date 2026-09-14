@@ -1,0 +1,137 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Mapa de Población">
+    <div topbar-actions class="topbar-actions">
+      <button class="topbar-btn" (click)="clearSelection()" title="Centrar mapa">
+        <ion-icon name="locate-outline"></ion-icon>
+      </button>
+    </div>
+
+    <section class="pm-hero">
+      <div class="pm-hero-text">
+        <span class="pm-eyebrow">San Andrés Islas · SIG</span>
+        <h1 class="pm-title">Mapa poblacional</h1>
+        <p class="pm-sub">
+          Distribución de residentes <strong>raizales</strong> y no raizales por sector de la isla.
+          El tamaño del punto refleja la población total; el color, la proporción raizal.
+        </p>
+      </div>
+      <div class="pm-hero-chip" *ngIf="totals">
+        <div class="chip-item">
+          <span class="chip-value">{{ totals.total | number:'1.0-0' }}</span>
+          <span class="chip-label">Habitantes</span>
+        </div>
+        <div class="chip-item">
+          <span class="chip-value">{{ totals.raizal | number:'1.0-0' }}</span>
+          <span class="chip-label">Raizales</span>
+        </div>
+        <div class="chip-item">
+          <span class="chip-value">{{ totals.other | number:'1.0-0' }}</span>
+          <span class="chip-label">Otros</span>
+        </div>
+        <div class="chip-item">
+          <span class="chip-value">{{ totals.zones }}</span>
+          <span class="chip-label">Sectores</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTROS -->
+    <section class="pm-toolbar">
+      <div class="pm-filter-group">
+        <label for="pm-filter">Filtrar sectores</label>
+        <select id="pm-filter" class="pm-select" [(ngModel)]="filter" (ngModelChange)="onFilterChange()">
+          <option value="todos">Todos los sectores</option>
+          <option value="raizal_dominante">Mayoría raizal (≥ 50%)</option>
+          <option value="mayor_poblacion">Mayor población</option>
+        </select>
+      </div>
+
+      <div class="pm-legend">
+        <span class="legend-title">Proporción raizal</span>
+        <span class="legend-item"><i class="dot" style="background:#dc2626;"></i> < 25%</span>
+        <span class="legend-item"><i class="dot" style="background:#d97706;"></i> 25–40%</span>
+        <span class="legend-item"><i class="dot" style="background:#16a34a;"></i> 40–60%</span>
+        <span class="legend-item"><i class="dot" style="background:#1d72b5;"></i> > 60%</span>
+      </div>
+    </section>
+
+    <!-- MAPA + SIDEBAR DATOS -->
+    <section class="pm-main">
+      <div class="pm-map-wrap">
+        <div #mapContainer class="pm-map"></div>
+
+        <div class="map-state map-loading" *ngIf="isLoading">
+          <div class="occre-spinner"></div>
+          <p>Cargando mapa de población...</p>
+        </div>
+
+        <div class="map-state map-error" *ngIf="error && !isLoading">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <p>{{ error }}</p>
+          <button class="retry-btn" (click)="reload()">Reintentar</button>
+        </div>
+      </div>
+
+      <aside class="pm-details">
+        <div class="pm-details-header" *ngIf="!selectedZone">
+          <h3>Explora la isla</h3>
+          <p>
+            Haz clic en un punto del mapa o selecciona un sector de la lista para
+            ver el detalle de población.
+          </p>
+        </div>
+
+        <div class="pm-details-header" *ngIf="selectedZone">
+          <div class="pm-zone-title">
+            <span class="pm-zone-dot" [style.background]="selectedZone.color"></span>
+            <h3>{{ selectedZone.name }}</h3>
+          </div>
+          <button class="pm-close" (click)="clearSelection()" aria-label="Cerrar detalle">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+
+        <ng-container *ngIf="selectedZone">
+          <div class="pm-zone-stats">
+            <div class="pm-stat">
+              <span class="pm-stat-value">{{ selectedZone.total_population | number:'1.0-0' }}</span>
+              <span class="pm-stat-label">Población total</span>
+            </div>
+            <div class="pm-stat">
+              <span class="pm-stat-value">{{ selectedZone.raizal_population | number:'1.0-0' }}</span>
+              <span class="pm-stat-label">Raizales</span>
+            </div>
+            <div class="pm-stat">
+              <span class="pm-stat-value">{{ selectedZone.other_population | number:'1.0-0' }}</span>
+              <span class="pm-stat-label">Otros residentes</span>
+            </div>
+          </div>
+
+          <div class="pm-bar">
+            <div class="pm-bar-fill" [style.width.%]="raizalPct(selectedZone)"></div>
+          </div>
+          <p class="pm-bar-label">
+            <b>{{ raizalPct(selectedZone) }}%</b> de la población de este sector es raizal.
+          </p>
+
+          <p class="pm-desc" *ngIf="selectedZone.description">{{ selectedZone.description }}</p>
+        </ng-container>
+
+        <div class="pm-list">
+          <h4>Sectores de la isla</h4>
+          <button
+            type="button"
+            class="pm-list-item"
+            *ngFor="let zone of filteredZones"
+            [class.active]="selectedZone?.id === zone.id"
+            (click)="selectZone(zone)"
+          >
+            <span class="pm-list-dot" [style.background]="zone.color"></span>
+            <span class="pm-list-name">{{ zone.name }}</span>
+            <span class="pm-list-val">{{ zone.total_population | number:'1.0-0' }}</span>
+          </button>
+        </div>
+      </aside>
+    </section>
+  </app-admin-layout>
+</ion-content>

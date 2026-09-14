@@ -1,0 +1,65 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Mis Solicitudes" [totalCount]="totalRequests + ' solicitudes asignadas'">
+  <div class="filters-row">
+    <select class="filter-select" [(ngModel)]="filterStatus" (change)="applyFilter()">
+      <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+    </select>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="occre-spinner"></div>
+    <p>Cargando solicitudes...</p>
+  </div>
+
+  <div class="error-state" *ngIf="error && !isLoading">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !error">
+    <div class="table-wrapper">
+      <table *ngIf="requests.length">
+        <thead>
+          <tr>
+            <th>Radicado</th>
+            <th>Trámite</th>
+            <th>Ciudadano</th>
+            <th>Estado</th>
+            <th>Prioridad</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let req of requests">
+            <td class="tracking-cell">{{ req.trackingNumber }}</td>
+            <td>{{ req.procedureName }}</td>
+            <td>{{ req.citizenName }}</td>
+            <td>
+              <span class="status-badge {{ getStatusClass(req.status) }}">{{ getStatusLabel(req.status) }}</span>
+            </td>
+            <td>
+              <span class="priority-badge {{ getPriorityClass(req.priority) }}">{{ req.priority }}</span>
+            </td>
+            <td class="date-cell">{{ req.submittedAt | date:'dd/MM/yyyy' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" *ngIf="!requests.length">
+        <ion-icon name="briefcase-outline"></ion-icon>
+        <p>No tienes solicitudes asignadas</p>
+      </div>
+    </div>
+
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button [disabled]="currentPage === 1" (click)="loadRequests(currentPage - 1)">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <span>Página {{ currentPage }} de {{ totalPages }}</span>
+      <button [disabled]="currentPage >= totalPages" (click)="loadRequests(currentPage + 1)">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+    </div>
+  </ng-container>
+</app-admin-layout>
+</ion-content>

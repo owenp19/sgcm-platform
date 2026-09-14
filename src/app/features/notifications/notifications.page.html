@@ -1,0 +1,120 @@
+<ion-content [fullscreen]="true" class="notifications-page">
+  <main class="notifications-screen">
+
+    <header class="notifications-header">
+      <button
+        type="button"
+        class="notifications-back-btn"
+        aria-label="Volver atrás"
+        (click)="goBack()"
+      >
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <span class="notifications-kicker">{{ 'notifications.kicker' | translate }}</span>
+      <h1 class="notifications-title">{{ 'notifications.title' | translate }}</h1>
+
+      <button
+        *ngIf="notifications.length > 0"
+        type="button"
+        class="notifications-clear-btn"
+        aria-label="{{ 'notifications.clear_aria' | translate }}"
+        (click)="clearAll()"
+      >
+        <ion-icon name="trash-outline"></ion-icon>
+        <span>{{ 'notifications.clear' | translate }}</span>
+      </button>
+    </header>
+
+    <section class="notifications-body" aria-label="Lista de notificaciones">
+
+      <div
+        class="notifications-empty"
+        *ngIf="notifications.length === 0"
+      >
+        <div class="notifications-empty-icon">
+          <ion-icon name="notifications-outline"></ion-icon>
+        </div>
+        <h2>{{ 'notifications.empty' | translate }}</h2>
+        <p>{{ 'notifications.empty_desc' | translate }}</p>
+      </div>
+
+      <ng-container *ngIf="notifications.length > 0">
+
+        <div class="notifications-summary-card">
+          <div class="notifications-summary-item">
+            <span class="notifications-summary-num">{{ notifications.length }}</span>
+            <span class="notifications-summary-label">{{ 'notifications.total' | translate }}</span>
+          </div>
+
+          <div class="notifications-summary-divider"></div>
+
+          <div class="notifications-summary-item accent">
+            <span class="notifications-summary-num">{{ unreadCount }}</span>
+            <span class="notifications-summary-label">{{ 'notifications.unread' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="notifications-filters">
+          <button
+            type="button"
+            class="notifications-filter-btn"
+            [class.active]="filter === 'all'"
+            (click)="setFilter('all')"
+          >
+            {{ 'notifications.filter_all' | translate }}
+          </button>
+
+          <button
+            type="button"
+            class="notifications-filter-btn"
+            [class.active]="filter === 'unread'"
+            (click)="setFilter('unread')"
+          >
+            {{ 'notifications.filter_unread' | translate }}
+            <span class="notifications-filter-count" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+          </button>
+        </div>
+
+        <div
+          class="notifications-list"
+          *ngIf="filteredNotifications.length > 0"
+        >
+          <button
+            type="button"
+            class="notifications-item"
+            *ngFor="let item of filteredNotifications"
+            [class.unread]="!item.read"
+            (click)="markAsRead(item)"
+          >
+            <div class="notifications-item-icon" [class]="'type-' + item.type">
+              <ion-icon [name]="item.icon"></ion-icon>
+            </div>
+
+            <div class="notifications-item-content">
+              <div class="notifications-item-header">
+                <span class="notifications-item-title">{{ item.title }}</span>
+                <span class="notifications-item-new" *ngIf="!item.read">{{ 'notifications.new' | translate }}</span>
+              </div>
+              <p class="notifications-item-desc">{{ item.description }}</p>
+
+              <div class="notifications-item-meta">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>{{ item.date }}</span>
+              </div>
+            </div>
+
+            <div class="notifications-item-dot" *ngIf="!item.read"></div>
+          </button>
+        </div>
+
+        <div class="notifications-filter-empty" *ngIf="filteredNotifications.length === 0">
+          <ion-icon name="checkmark-done-outline"></ion-icon>
+          <p>{{ 'notifications.filter_empty' | translate }}</p>
+        </div>
+
+      </ng-container>
+
+    </section>
+  </main>
+</ion-content>

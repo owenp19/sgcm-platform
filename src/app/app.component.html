@@ -1,0 +1,20 @@
+<ion-app>
+  <ion-router-outlet></ion-router-outlet>
+
+  <app-occre-chatbot *ngIf="showChatbot"></app-occre-chatbot>
+
+  <div class="app-loader" *ngIf="isLoading">
+    <div class="app-loader-backdrop"></div>
+    <div class="app-loader-content">
+      <img
+        class="app-loader-logo"
+        src="assets/images/logo-occre-blanco.png"
+        [attr.alt]="'welcome.alt_logo' | translate"
+      />
+      <div class="app-loader-track">
+        <div class="app-loader-bar"></div>
+      </div>
+      <p class="app-loader-text">{{ 'app.loading' | translate }}</p>
+    </div>
+  </div>
+</ion-app>

@@ -1,0 +1,70 @@
+<div class="admin-layout">
+  <div class="sidebar-backdrop" [class.show]="sidebarOpen" (click)="sidebarOpen = false"></div>
+  <aside class="admin-sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <img src="assets/images/logo-occre-blanco.png" alt="OCCRE" class="sidebar-logo" />
+      <span class="sidebar-brand">SGCM · OCCRE</span>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-label">Menú principal</span>
+      <a class="sidebar-item" routerLink="/admin/dashboard" routerLinkActive="active">
+        <ion-icon name="home-outline"></ion-icon><span>Panel de control</span>
+      </a>
+      <a class="sidebar-item" routerLink="/admin/reports" routerLinkActive="active">
+        <ion-icon name="bar-chart-outline"></ion-icon><span>Reportes</span>
+      </a>
+      <a class="sidebar-item" routerLink="/admin/population-map" routerLinkActive="active">
+        <ion-icon name="map-outline"></ion-icon><span>Mapa de población</span>
+      </a>
+      <a class="sidebar-item" routerLink="/admin/documents" routerLinkActive="active">
+        <ion-icon name="document-text-outline"></ion-icon><span>Documentos</span>
+      </a>
+      <a class="sidebar-item" routerLink="/admin/requests" routerLinkActive="active">
+        <ion-icon name="clipboard-outline"></ion-icon><span>Solicitudes</span>
+      </a>
+      <a class="sidebar-item" routerLink="/admin/appointments" routerLinkActive="active">
+        <ion-icon name="calendar-outline"></ion-icon><span>Citas</span>
+      </a>
+      <a class="sidebar-item" routerLink="/admin/users" routerLinkActive="active">
+        <ion-icon name="people-outline"></ion-icon><span>Usuarios</span>
+      </a>
+      <a class="sidebar-item" routerLink="/admin/audit" routerLinkActive="active" *ngIf="isAdmin">
+        <ion-icon name="shield-outline"></ion-icon><span>Auditoría</span>
+      </a>
+      <div class="sidebar-spacer"></div>
+      <span class="nav-label">Mi cuenta</span>
+      <a class="sidebar-item" routerLink="/admin/profile" routerLinkActive="active">
+        <ion-icon name="person-outline"></ion-icon><span>Mi Perfil</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">{{ getUserInitials() }}</div>
+        <div class="user-info">
+          <p class="user-name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</p>
+          <p class="user-role">Funcionario OCCRE</p>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon><span>Cerrar sesión</span>
+      </button>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <header class="admin-topbar">
+      <button class="toggle-sidebar" (click)="sidebarOpen = !sidebarOpen">
+        <ion-icon name="menu-outline"></ion-icon>
+      </button>
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h2>{{ title }}</h2>
+      <span class="topbar-spacer"></span>
+      <ng-content select="[topbar-actions]"></ng-content>
+      <span class="total-count" *ngIf="totalCount">{{ totalCount }}</span>
+    </header>
+    <div class="admin-content">
+      <ng-content></ng-content>
+    </div>
+  </main>
+</div>

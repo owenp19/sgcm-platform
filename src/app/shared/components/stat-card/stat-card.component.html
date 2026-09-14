@@ -1,0 +1,23 @@
+<div class="stat-card {{ colorClass }}" [class.clickable]="!!link" [class.is-loading]="loading" (click)="link && cardClick.emit()">
+  <div class="stat-loading" *ngIf="loading">
+    <div class="stat-loader-pulse"></div>
+  </div>
+  <ng-container *ngIf="!loading">
+    <div class="stat-header">
+      <div class="stat-icon">
+        <ion-icon [name]="icon"></ion-icon>
+      </div>
+      <div class="stat-trend" *ngIf="trend">
+        <ion-icon [name]="trend === 'up' ? 'trending-up-outline' : trend === 'down' ? 'trending-down-outline' : 'remove-outline'"></ion-icon>
+        <span *ngIf="trendValue">{{ trendValue }}</span>
+      </div>
+    </div>
+    <div class="stat-body">
+      <span class="stat-value">{{ value | number }}</span>
+      <span class="stat-label">{{ label }}</span>
+    </div>
+    <div class="stat-footer" *ngIf="subtitle">
+      <span class="stat-subtitle">{{ subtitle }}</span>
+    </div>
+  </ng-container>
+</div>

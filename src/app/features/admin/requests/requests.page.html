@@ -1,0 +1,117 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Solicitudes" [totalCount]="totalRequests + ' solicitudes'">
+    <div class="admin-content-inner">
+
+      <!-- HERO -->
+      <section class="pg-hero">
+        <div class="pg-hero-text">
+          <span class="pg-eyebrow">Gestión de trámites</span>
+          <h1 class="pg-title">Solicitudes y radicados</h1>
+          <p class="pg-sub">Gestiona el estado, prioridad y asignación de cada solicitud de los ciudadanos.</p>
+        </div>
+        <div class="pg-hero-chip">
+          <ion-icon name="clipboard-outline"></ion-icon>
+          <div>
+            <span class="pg-chip-value">{{ totalRequests }}</span>
+            <span class="pg-chip-label">solicitudes</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTERS -->
+      <section class="pg-toolbar">
+        <div class="search-field">
+          <ion-icon name="search-outline"></ion-icon>
+          <input type="text" placeholder="Buscar por radicado, ciudadano o trámite..." [(ngModel)]="searchTerm" (keyup.enter)="applyFilter()" />
+        </div>
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="loadRequests(1)">
+          <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+        <select class="filter-select" [(ngModel)]="priorityFilter" (change)="loadRequests(1)">
+          <option *ngFor="let opt of priorityOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </section>
+
+      <!-- LOADING -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="occre-spinner"></div>
+        <p>Cargando solicitudes...</p>
+      </div>
+
+      <!-- ERROR -->
+      <div class="error-state" *ngIf="error && !isLoading">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <p>{{ error }}</p>
+        <button class="retry-btn" (click)="loadRequests()">Reintentar</button>
+      </div>
+
+      <!-- TABLE -->
+      <ng-container *ngIf="!isLoading && !error">
+        <div class="data-card">
+          <table *ngIf="filteredRequests.length">
+            <thead>
+              <tr>
+                <th>Radicado</th>
+                <th>Trámite</th>
+                <th>Ciudadano</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+                <th>Asignado a</th>
+                <th>Fecha</th>
+                <th class="actions-col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let req of filteredRequests">
+                <td class="tracking-cell">{{ req.trackingNumber }}</td>
+                <td><span class="procedure-cell">{{ req.procedureName }}</span></td>
+                <td><span class="user-tag">{{ req.citizenName }}</span></td>
+                <td>
+                  <span class="priority-badge" *ngIf="req.priority" [class]="'priority-' + req.priority">
+                    {{ getPriorityLabel(req.priority) }}
+                  </span>
+                  <span class="no-data" *ngIf="!req.priority">—</span>
+                </td>
+                <td>
+                  <span class="status-badge {{ getStatusClass(req.status) }}">
+                    {{ getStatusLabel(req.status) }}
+                  </span>
+                </td>
+                <td class="assigned-cell">{{ req.assignedName || '—' }}</td>
+                <td class="date-cell">{{ req.submittedAt | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <div class="icon-btns">
+                    <button class="icon-btn icon-btn-primary" (click)="updateStatus(req)" title="Cambiar estado">
+                      <ion-icon name="swap-horizontal-outline"></ion-icon>
+                    </button>
+                    <button class="icon-btn icon-btn-info" (click)="assignRequest(req)" title="Asignar funcionario">
+                      <ion-icon name="person-add-outline"></ion-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="empty-state" *ngIf="!filteredRequests.length">
+            <ion-icon name="clipboard-outline"></ion-icon>
+            <p>{{ searchTerm || statusFilter ? 'No se encontraron solicitudes con esos filtros' : 'No hay solicitudes registradas' }}</p>
+          </div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button class="pg-btn" [disabled]="currentPage === 1" (click)="loadRequests(currentPage - 1)">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+            <span class="pg-btn-label">Anterior</span>
+          </button>
+          <span class="pg-info">Página {{ currentPage }} de {{ totalPages }}</span>
+          <button class="pg-btn" [disabled]="currentPage >= totalPages" (click)="loadRequests(currentPage + 1)">
+            <span class="pg-btn-label">Siguiente</span>
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </app-admin-layout>
+</ion-content>

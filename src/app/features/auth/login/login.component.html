@@ -1,0 +1,221 @@
+<ion-content class="login-page" [fullscreen]="true">
+  <div class="status-space"></div>
+
+  <main class="login-wrapper">
+    <!-- LOGO -->
+    <section class="brand-section">
+      <img src="assets/images/logo-occre.png" [attr.alt]="'welcome.alt_logo' | translate" class="brand-logo" />
+
+      <h1>{{ 'login.welcome' | translate }}</h1>
+      <p>{{ 'login.welcome_sub' | translate }}</p>
+    </section>
+
+    <!-- FORMULARIO LOGIN -->
+    <section class="login-form">
+      <div class="input-group">
+        <label>{{ 'login.email' | translate }}</label>
+        <div class="input-field">
+          <ion-icon name="mail-outline"></ion-icon>
+          <ion-input
+            type="text"
+            inputmode="email"
+            autocomplete="email"
+            [placeholder]="'login.email' | translate"
+            [value]="email"
+            (ionInput)="onEmailInput($event)"
+          ></ion-input>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>{{ 'login.password' | translate }}</label>
+        <div class="input-field">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <ion-input
+            [type]="showPassword ? 'text' : 'password'"
+            autocomplete="current-password"
+            [placeholder]="'login.password' | translate"
+            [value]="password"
+            (ionInput)="onPasswordInput($event)"
+          ></ion-input>
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="forgot-row">
+        <button type="button" [disabled]="isRecoveringPassword" (click)="recoverPassword()">
+          <span *ngIf="!isRecoveringPassword">{{ 'login.forgot' | translate }}</span>
+          <span *ngIf="isRecoveringPassword">{{ 'common.loading' | translate }}</span>
+        </button>
+      </div>
+
+      <ion-button
+        expand="block"
+        class="login-btn"
+        [disabled]="!isFormValid || isSubmitting"
+        (click)="login()"
+      >
+        <ion-spinner *ngIf="isSubmitting" name="crescent"></ion-spinner>
+        <span *ngIf="!isSubmitting">{{ 'login.submit' | translate }}</span>
+      </ion-button>
+    </section>
+
+    <!-- ERROR -->
+    <div class="error-block" *ngIf="errorMessage">
+      <p class="form-error">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        {{ errorMessage }}
+      </p>
+      <div class="error-actions" *ngIf="errorCode === 'network' || errorCode === 'server'">
+        <ion-button
+          fill="clear"
+          class="error-retry-btn"
+          [disabled]="isRetrying || isSubmitting"
+          (click)="retryLogin()"
+        >
+          <ion-icon name="refresh-outline" slot="start"></ion-icon>
+          <span *ngIf="!isRetrying">{{ 'common.retry' | translate }}</span>
+          <span *ngIf="isRetrying">{{ 'login.checking_server' | translate }}</span>
+        </ion-button>
+        <ion-button
+          fill="clear"
+          class="error-settings-btn"
+          (click)="openServerConfig()"
+        >
+          <ion-icon name="settings-outline" slot="start"></ion-icon>
+          {{ 'login.server_settings' | translate }}
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- SERVER CONFIG MODAL -->
+    <div class="server-config-overlay" *ngIf="showServerConfig" (click)="closeServerConfig()">
+      <div class="server-config-modal" (click)="$event.stopPropagation()">
+        <div class="server-config-header">
+          <h3>{{ 'login.server_config_title' | translate }}</h3>
+          <button type="button" class="server-config-close" (click)="closeServerConfig()">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+
+        <p class="server-config-desc">{{ 'login.server_config_desc' | translate }}</p>
+
+        <ion-item lines="none" class="server-input-card">
+          <ion-icon name="server-outline" slot="start"></ion-icon>
+          <ion-input
+            type="url"
+            inputmode="url"
+            [placeholder]="'settings.server.placeholder' | translate"
+            [value]="serverUrl"
+            (ionInput)="onServerUrlInput($event)"
+          ></ion-input>
+        </ion-item>
+
+        <p class="server-config-msg" *ngIf="serverConfigMessage"
+           [class.success]="serverConfigMessageType === 'success'"
+           [class.error]="serverConfigMessageType === 'error'">
+          {{ serverConfigMessage }}
+        </p>
+
+        <div class="server-config-actions">
+          <ion-button
+            expand="block"
+            class="server-save-btn"
+            [disabled]="isSavingServer || !serverUrl"
+            (click)="saveServerUrl()"
+          >
+            <ion-spinner *ngIf="isSavingServer" name="crescent"></ion-spinner>
+            <span *ngIf="!isSavingServer">{{ 'settings.server.save' | translate }}</span>
+          </ion-button>
+
+          <button type="button" class="server-reset-link" (click)="resetServerUrl()">
+            {{ 'settings.server.reset' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BIOMÉTRICO -->
+    <div class="biometric-section" *ngIf="biometricAvailable">
+      <div class="divider">
+        <span></span>
+        <p>{{ 'login.or' | translate }}</p>
+        <span></span>
+      </div>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        class="biometric-btn"
+        (click)="biometricLogin()"
+      >
+        <ion-icon name="finger-print-outline" slot="start"></ion-icon>
+        {{ 'login.biometric' | translate:{label: biometryLabel} }}
+      </ion-button>
+    </div>
+
+    <!-- DIVISOR -->
+    <div class="divider">
+      <span></span>
+      <p>{{ 'login.also' | translate }}</p>
+      <span></span>
+    </div>
+
+    <!-- CREAR CUENTA -->
+    <ion-button
+      expand="block"
+      fill="outline"
+      class="register-btn"
+      [disabled]="isGoingToRegister"
+      (click)="goToRegister()"
+    >
+      <ion-icon name="person-add-outline" slot="start"></ion-icon>
+      <span *ngIf="!isGoingToRegister">{{ 'login.create' | translate }}</span>
+      <span *ngIf="isGoingToRegister">{{ 'common.loading' | translate }}</span>
+    </ion-button>
+
+    <!-- ACCESO FUNCIONARIOS -->
+    <div class="divider staff-divider">
+      <span></span>
+      <p>{{ 'login.staff' | translate }}</p>
+      <span></span>
+    </div>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      class="staff-btn"
+      (click)="goToAdminLogin()"
+    >
+      <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+      <span>{{ 'login.staff_access' | translate }}</span>
+    </ion-button>
+
+    <!-- TARJETA VISITANTE -->
+    <section class="visitor-card">
+      <div class="visitor-info">
+        <span>{{ 'login.visitor_question' | translate }}</span>
+
+        <p>{{ 'login.visitor_desc' | translate }}</p>
+
+        <ion-button expand="block" class="visitor-access-btn" (click)="goToTourismCard()">
+          {{ 'login.visitor_access' | translate }}
+        </ion-button>
+      </div>
+    </section>
+
+    <!-- AYUDA -->
+    <section class="help-section">
+      <ion-icon name="headset-outline"></ion-icon>
+
+      <div>
+        <h3>{{ 'common.help' | translate }}</h3>
+        <p>{{ 'common.contact' | translate }}</p>
+      </div>
+    </section>
+
+    <img src="assets/images/login_screen.png" alt="" class="bottom-decoration" />
+  </main>
+</ion-content>

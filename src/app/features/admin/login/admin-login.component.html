@@ -1,0 +1,81 @@
+<ion-content class="admin-login-page">
+  <div class="login-container">
+    <div class="login-left">
+      <div class="login-form-wrapper">
+        <div class="brand-section">
+          <img src="assets/images/logo-occre.png" alt="OCCRE" class="brand-logo" />
+          <h1>Plataforma Administrativa</h1>
+          <p>Ingresa con tus credenciales de funcionario</p>
+        </div>
+
+        <div class="form-section">
+          <div class="input-group">
+            <label>Correo electrónico</label>
+            <div class="input-field">
+              <ion-icon name="mail-outline"></ion-icon>
+              <ion-input
+                type="text"
+                inputmode="email"
+                autocomplete="email"
+                placeholder="correo@occre.gov.co"
+                [value]="email"
+                (ionInput)="onEmailInput($event)"
+              ></ion-input>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Contraseña</label>
+            <div class="input-field">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <ion-input
+                [type]="showPassword ? 'text' : 'password'"
+                autocomplete="current-password"
+                placeholder="Ingresa tu contraseña"
+                [value]="password"
+                (ionInput)="onPasswordInput($event)"
+              ></ion-input>
+              <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+                <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <p class="error-message" *ngIf="errorMessage">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            {{ errorMessage }}
+          </p>
+
+          <ion-button
+            expand="block"
+            class="login-btn"
+            [disabled]="!isFormValid || isSubmitting"
+            (click)="login()"
+          >
+            <ion-spinner *ngIf="isSubmitting" name="crescent"></ion-spinner>
+            <span *ngIf="!isSubmitting">Iniciar sesión</span>
+          </ion-button>
+
+          <div class="additional-links">
+            <a routerLink="/login">Volver al inicio de ciudadanos</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-right">
+      <div class="branding-content">
+        <div class="branding-bg"></div>
+        <div class="branding-overlay"></div>
+        <div class="branding-text">
+          <h2>OCCRE</h2>
+          <p>Oficina de Control, Circulación y Residencia</p>
+          <span class="branding-divider"></span>
+          <p class="branding-sub">
+            Sistema de gestión administrativa para funcionarios de OCCRE de San Andrés Islas.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

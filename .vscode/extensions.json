@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "Angular.ng-template",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+    "eamodio.gitlens",
+    "cweijan.vscode-mysql-client2",
+    "waderyan.nodejs-extension-pack",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-typescript-next",
+    "Webnative.webnative"
+  ]
+}

@@ -1,0 +1,3576 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "SGCM API",
+        "description": "API REST del sistema SGCM (Cámara de Comercio). Autenticación vía JWT Bearer Token.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000/api",
+            "description": "Servidor local de desarrollo"
+        }
+    ],
+    "paths": {
+        "/admin/dashboard": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Estadísticas del panel de administración",
+                "operationId": "ad4891afa4bfb0843f380c82e857f954",
+                "parameters": [
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "description": "Fecha inicial (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "description": "Fecha final (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado de la solicitud",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pendiente",
+                                "en_revision",
+                                "aprobado",
+                                "rechazado",
+                                "devuelto",
+                                "finalizado"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estadísticas del dashboard"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/audit-log": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Consultar el registro de auditoría",
+                "operationId": "0c383290f127054a39dc5c22b4f319ba",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Cantidad por página",
+                        "schema": {
+                            "type": "integer",
+                            "default": 50
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Término de búsqueda",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "description": "Fecha inicial (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "description": "Fecha final (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "action",
+                        "in": "query",
+                        "description": "Acción a filtrar",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "entityType",
+                        "in": "query",
+                        "description": "Tipo de entidad a filtrar",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de logs de auditoría con paginación"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/reports": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Generar reporte de solicitudes agrupado",
+                "operationId": "15778c1bc52fcf29d232c50520555d60",
+                "parameters": [
+                    {
+                        "name": "groupBy",
+                        "in": "query",
+                        "description": "Criterio de agrupación",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "procedure",
+                                "status",
+                                "funcionario",
+                                "date"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "description": "Fecha inicial (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "description": "Fecha final (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte de solicitudes"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/export/excel": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Exportar solicitudes a Excel",
+                "operationId": "23a2e73746999246a813fc0d994fbcab",
+                "parameters": [
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "description": "Fecha inicial (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "description": "Fecha final (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado de la solicitud",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pendiente",
+                                "en_revision",
+                                "aprobado",
+                                "rechazado",
+                                "devuelto",
+                                "finalizado"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Archivo Excel (reporte_occre.xlsx)"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/export/pdf": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Exportar solicitudes a PDF",
+                "operationId": "b97867f39b8d10bd9bbe2ddcafe5407d",
+                "parameters": [
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "description": "Fecha inicial (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "description": "Fecha final (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado de la solicitud",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pendiente",
+                                "en_revision",
+                                "aprobado",
+                                "rechazado",
+                                "devuelto",
+                                "finalizado"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Archivo PDF (reporte_occre.pdf)"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/funcionarios": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Listar funcionarios y administradores",
+                "operationId": "4879f1625adc1467804f5fb047e2ebe8",
+                "responses": {
+                    "200": {
+                        "description": "Listado de funcionarios"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/announcements/active": {
+            "get": {
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Listar comunicados activos publicados",
+                "operationId": "9c27609c2e5c2126140fce7e13ba514e",
+                "responses": {
+                    "200": {
+                        "description": "Lista de comunicados activos"
+                    }
+                }
+            }
+        },
+        "/announcements": {
+            "get": {
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Listar todos los comunicados",
+                "operationId": "8ef4148f81f78c159c2e2498ae7fd73f",
+                "responses": {
+                    "200": {
+                        "description": "Lista de comunicados"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Crear un nuevo comunicado",
+                "operationId": "46b2b7f9955057ef85c71e44b3d19176",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "body"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Aviso importante",
+                                        "maxLength": 255
+                                    },
+                                    "body": {
+                                        "type": "string",
+                                        "example": "Contenido del comunicado"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "info",
+                                        "nullable": true,
+                                        "enum": [
+                                            "info",
+                                            "alert",
+                                            "important"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comunicado creado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/announcements/{id}": {
+            "put": {
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Actualizar un comunicado",
+                "operationId": "0a46b30303be8a77cd170b4de8fd3ed0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del comunicado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Aviso actualizado",
+                                        "nullable": true,
+                                        "maxLength": 255
+                                    },
+                                    "body": {
+                                        "type": "string",
+                                        "example": "Contenido actualizado",
+                                        "nullable": true
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "important",
+                                        "nullable": true,
+                                        "enum": [
+                                            "info",
+                                            "alert",
+                                            "important"
+                                        ]
+                                    },
+                                    "isActive": {
+                                        "type": "boolean",
+                                        "example": true,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comunicado actualizado"
+                    },
+                    "400": {
+                        "description": "No hay campos para actualizar"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    },
+                    "404": {
+                        "description": "Comunicado no encontrado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Eliminar un comunicado",
+                "operationId": "369feb95ad6ff00e81dcfb67a7d6a926",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del comunicado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comunicado eliminado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/appointments/services": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Listar servicios disponibles para citas",
+                "operationId": "30e4a6c2df7d2d46cfa3f35203941f06",
+                "responses": {
+                    "200": {
+                        "description": "Lista de servicios"
+                    }
+                }
+            }
+        },
+        "/appointments/offices": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Listar oficinas activas",
+                "operationId": "a4a84bb53aee46da2731c29b6a70442d",
+                "responses": {
+                    "200": {
+                        "description": "Lista de oficinas"
+                    }
+                }
+            }
+        },
+        "/appointments/availability": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Consultar disponibilidad de horas para una cita",
+                "operationId": "29c8009b20428c7f69598e7e92d3b6e7",
+                "parameters": [
+                    {
+                        "name": "office_id",
+                        "in": "query",
+                        "description": "ID de la oficina",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "service_id",
+                        "in": "query",
+                        "description": "ID del servicio (opcional)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Fecha (formato Y-m-d)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Horas disponibles"
+                    },
+                    "404": {
+                        "description": "Oficina no encontrada"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/appointments": {
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Agendar una nueva cita",
+                "operationId": "2a661588be88bdd1a61996bbf335d88a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "scheduled_date",
+                                    "scheduled_time",
+                                    "citizen_full_name",
+                                    "citizen_email"
+                                ],
+                                "properties": {
+                                    "service_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "office_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "scheduled_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-09-20"
+                                    },
+                                    "scheduled_time": {
+                                        "type": "string",
+                                        "example": "09:00"
+                                    },
+                                    "citizen_full_name": {
+                                        "type": "string",
+                                        "example": "Owen Pérez"
+                                    },
+                                    "citizen_document_type": {
+                                        "type": "string",
+                                        "example": "CC",
+                                        "nullable": true
+                                    },
+                                    "citizen_document_number": {
+                                        "type": "string",
+                                        "example": "1020304050",
+                                        "nullable": true
+                                    },
+                                    "citizen_email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "citizen_phone": {
+                                        "type": "string",
+                                        "example": "3001234567",
+                                        "nullable": true
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Observaciones adicionales",
+                                        "nullable": true
+                                    },
+                                    "documents": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        },
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cita agendada exitosamente"
+                    },
+                    "400": {
+                        "description": "Faltan campos obligatorios"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "409": {
+                        "description": "La fecha y hora seleccionadas no están disponibles"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/appointments/{code}": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Obtener una cita por su código",
+                "operationId": "1881c9e46c9774d849c26a88186f606e",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "Código de la cita",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalle de la cita"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Cita no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/appointments/my": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Listar citas del usuario autenticado",
+                "operationId": "13bd90e073a1a18cc40d36643d1bfc6e",
+                "responses": {
+                    "200": {
+                        "description": "Lista de citas del usuario"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/appointments/{id}/cancel": {
+            "patch": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Cancelar una cita",
+                "operationId": "72cd60b832e684d146c800e6deaed172",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la cita",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cita cancelada exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No tienes permisos para cancelar esta cita"
+                    },
+                    "404": {
+                        "description": "Cita no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/appointments/all": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Listar todas las citas (admin/funcionario)",
+                "operationId": "b022eb45f066d5be879872aced87de1c",
+                "parameters": [
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Filtrar por fecha (formato Y-m-d)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de citas"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos para consultar"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registrar un nuevo usuario ciudadano",
+                "operationId": "08136088c4862c313b35d6518bab8d3a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "firstName",
+                                    "lastName",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "firstName": {
+                                        "type": "string",
+                                        "example": "Owen"
+                                    },
+                                    "lastName": {
+                                        "type": "string",
+                                        "example": "Pérez"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 6
+                                    },
+                                    "documentType": {
+                                        "type": "string",
+                                        "example": "CC"
+                                    },
+                                    "documentNumber": {
+                                        "type": "string",
+                                        "example": "1020304050"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "3001234567"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado"
+                    },
+                    "409": {
+                        "description": "El correo ya está registrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Iniciar sesión y obtener token JWT",
+                "operationId": "99d66635c4992aeaa6aa44ff653d0563",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "owen@sgcm.app"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "owen12345"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login exitoso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciales inválidas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/auth/profile": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Obtener el perfil del usuario autenticado",
+                "operationId": "2333ee44a6837011f67bc613bb232938",
+                "responses": {
+                    "200": {
+                        "description": "Perfil del usuario"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Actualizar el perfil del usuario autenticado",
+                "operationId": "1b6f918eb3f3cd3b4d27be8eb1979861",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "firstName",
+                                    "lastName"
+                                ],
+                                "properties": {
+                                    "firstName": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "minLength": 2
+                                    },
+                                    "lastName": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "minLength": 2
+                                    },
+                                    "documentType": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "maxLength": 10
+                                    },
+                                    "documentNumber": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "maxLength": 50
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "maxLength": 30
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Perfil actualizado exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/photo": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Actualizar la foto de perfil del usuario autenticado",
+                "operationId": "cb2f1d418a0e3b1d79b08de81013095d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "photoUrl"
+                                ],
+                                "properties": {
+                                    "photoUrl": {
+                                        "type": "string",
+                                        "format": "uri"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Foto actualizada exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Solicitar recuperación de contraseña",
+                "operationId": "fea89d2766defe4ad877001920e3f289",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Correo de recuperación enviado si el usuario existe"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Restablecer la contraseña con el token recibido",
+                "operationId": "b8d03d5b689dcb65d3771f62d4f90a24",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "description": "Token de recuperación",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 6
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Contraseña restablecida exitosamente"
+                    },
+                    "400": {
+                        "description": "Token inválido o expirado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/auth/change-password": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Cambiar la contraseña del usuario autenticado",
+                "operationId": "4f3b37d88dcba49e338658cd7279041c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "currentPassword",
+                                    "newPassword"
+                                ],
+                                "properties": {
+                                    "currentPassword": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "newPassword": {
+                                        "description": "Debe ser distinta de la actual",
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 6
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Contraseña actualizada exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado o contraseña actual incorrecta"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/change-email": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Cambiar el correo del usuario autenticado",
+                "operationId": "ac510671f22520ca81e9b33be31cd526",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "newEmail",
+                                    "currentPassword"
+                                ],
+                                "properties": {
+                                    "newEmail": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "currentPassword": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Correo actualizado exitosamente"
+                    },
+                    "400": {
+                        "description": "El nuevo correo es igual al actual"
+                    },
+                    "401": {
+                        "description": "No autenticado o contraseña incorrecta"
+                    },
+                    "409": {
+                        "description": "El correo ya está registrado en otra cuenta"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/users": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Listar usuarios con paginación",
+                "operationId": "dd3f09b6d976e0d14b2a2f382192387c",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Cantidad de usuarios por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuarios con paginación"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/users/{userId}/roles": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Actualizar los roles de un usuario",
+                "operationId": "56ae3bbe696579522ad7c925d93476f0",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID del usuario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "roles"
+                                ],
+                                "properties": {
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Roles actualizados exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/biometric-preference": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Obtener la preferencia biométrica del usuario autenticado",
+                "operationId": "cc4250101f43782d0b193d532680d8a4",
+                "responses": {
+                    "200": {
+                        "description": "Preferencia biométrica del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "biometricEnabled": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Activar o desactivar la preferencia biométrica del usuario autenticado",
+                "operationId": "7d8a9e57c601cd55d987620b1d63b9ad",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "enabled"
+                                ],
+                                "properties": {
+                                    "enabled": {
+                                        "description": "True para activar el acceso biométrico",
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Preferencia guardada"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/certificates/generate/{trackingNumber}": {
+            "get": {
+                "tags": [
+                    "Certificates"
+                ],
+                "summary": "Generar constancia PDF de una solicitud aprobada",
+                "operationId": "7004f2a954dbfa71983b3890530f7ce3",
+                "parameters": [
+                    {
+                        "name": "trackingNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PDF de la constancia"
+                    },
+                    "400": {
+                        "description": "Solicitud no aprobada ni finalizada"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin acceso a la solicitud"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/certificates/validate-qr": {
+            "post": {
+                "tags": [
+                    "Certificates"
+                ],
+                "summary": "Validar el contenido de un QR de constancia",
+                "operationId": "2bb1b662fc4f3ce8ab1eb9bf7b43fdce",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "qrData"
+                                ],
+                                "properties": {
+                                    "qrData": {
+                                        "description": "Payload JSON codificado en el QR",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Constancia válida"
+                    },
+                    "400": {
+                        "description": "Formato QR inválido"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/chat": {
+            "post": {
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "Enviar mensaje al asistente virtual",
+                "operationId": "5f053adaccb4521f927793d4f4e8245c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "message"
+                                ],
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "maxLength": 4000
+                                    },
+                                    "history": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "role",
+                                                "text"
+                                            ],
+                                            "properties": {
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "text": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Respuesta del asistente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    },
+                    "502": {
+                        "description": "Error de conexión con el asistente"
+                    },
+                    "503": {
+                        "description": "Asistente aún no configurado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/devices/register": {
+            "post": {
+                "tags": [
+                    "Devices"
+                ],
+                "summary": "Registrar un dispositivo para notificaciones push",
+                "operationId": "42ff325490fbd6d5afebb21ec6e807b2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token",
+                                    "platform"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "expo-push-token",
+                                        "maxLength": 500
+                                    },
+                                    "platform": {
+                                        "type": "string",
+                                        "example": "android",
+                                        "enum": [
+                                            "android",
+                                            "ios",
+                                            "web"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Dispositivo registrado exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/devices/unregister": {
+            "post": {
+                "tags": [
+                    "Devices"
+                ],
+                "summary": "Desregistrar un dispositivo de notificaciones push",
+                "operationId": "d4af7f6c55e4173f4aa6f75969f3807f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "expo-push-token",
+                                        "maxLength": 500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Dispositivo desregistrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/devices/my": {
+            "get": {
+                "tags": [
+                    "Devices"
+                ],
+                "summary": "Listar dispositivos registrados del usuario",
+                "operationId": "6aeb5c3a53164913451424cad93b847d",
+                "responses": {
+                    "200": {
+                        "description": "Lista de dispositivos registrados"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/documents": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Listar documentos de todas las solicitudes",
+                "operationId": "ee2c374d7c9db8a4fbf351f10d134c01",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Cantidad por página",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Buscar por nombre, ciudadano, correo o número de radicado",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado de validación",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "validated",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "documentType",
+                        "in": "query",
+                        "description": "Filtrar por tipo de documento",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "description": "Fecha inicial (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "description": "Fecha final (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "description": "Filtrar por usuario",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de documentos con paginación"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/documents/stats": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Estadísticas de documentos (total, validados, pendientes)",
+                "operationId": "0b63bf042e58d0d12cdc1196de08c866",
+                "responses": {
+                    "200": {
+                        "description": "Estadísticas de documentos"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos de administrador"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/documents/upload": {
+            "post": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Subir un documento a una solicitud",
+                "operationId": "d8b20d02f16502b08715feacaece3d52",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "requestId",
+                                    "file"
+                                ],
+                                "properties": {
+                                    "requestId": {
+                                        "type": "integer"
+                                    },
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "documentType": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Documento subido exitosamente"
+                    },
+                    "400": {
+                        "description": "Solicitud o archivo inválido"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos para subir documentos"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/documents/{id}/download": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Descargar un documento",
+                "operationId": "900f4406813ec043220e0ab4bd028af2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Archivo descargado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin acceso al documento"
+                    },
+                    "404": {
+                        "description": "Documento o archivo no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/documents/{id}/validate": {
+            "patch": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Validar o rechazar un documento",
+                "operationId": "c893ef6d1fcf10690342a11d1106d749",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "isValid"
+                                ],
+                                "properties": {
+                                    "isValid": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Documento validado o rechazado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos para validar"
+                    },
+                    "404": {
+                        "description": "Documento no encontrado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/documents/{id}": {
+            "delete": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Eliminar un documento",
+                "description": "Mejora de seguridad respecto al backend Node: se verifica que el usuario\nsea dueño del documento o staff antes de eliminarlo.",
+                "operationId": "394311fc5896938d7c0cb9248df5475e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Documento eliminado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos para eliminar"
+                    },
+                    "404": {
+                        "description": "Documento no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Listar notificaciones del usuario autenticado",
+                "operationId": "69940517177760761deb8ed6debf1c5e",
+                "responses": {
+                    "200": {
+                        "description": "Lista de notificaciones"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/notifications/{id}/read": {
+            "patch": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Marcar una notificación como leída",
+                "operationId": "356012fe06901053b88e36ec633c6524",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la notificación",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notificación marcada como leída"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/notifications/read-all": {
+            "patch": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Marcar todas las notificaciones como leídas",
+                "operationId": "889963835d78ee30e0cb8a9e30abff39",
+                "responses": {
+                    "200": {
+                        "description": "Todas las notificaciones marcadas como leídas"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/notifications/unread-count": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Obtener el conteo de notificaciones no leídas",
+                "operationId": "196cf6297de565057f12641ea5e7b245",
+                "responses": {
+                    "200": {
+                        "description": "Conteo de notificaciones no leídas"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/notifications/clear-all": {
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Eliminar todas las notificaciones del usuario",
+                "operationId": "13246e27f555f5d2e9e147472315da21",
+                "responses": {
+                    "200": {
+                        "description": "Notificaciones eliminadas"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/notifications/seed": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Crear notificaciones de ejemplo para el usuario",
+                "operationId": "2082eca8abef0bd3c7c18ddae0182b1e",
+                "responses": {
+                    "201": {
+                        "description": "Notificaciones de ejemplo creadas"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/procedures": {
+            "get": {
+                "tags": [
+                    "Procedures"
+                ],
+                "summary": "Obtener todos los trámites activos",
+                "operationId": "2b5944740831a7c78d8e362a65ec70c6",
+                "responses": {
+                    "200": {
+                        "description": "Lista de trámites"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Procedures"
+                ],
+                "summary": "Crear un nuevo tipo de trámite",
+                "operationId": "8d2e8c551e0b8e383dfd44ba6996bc4c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "slug"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "slug": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "requirements": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "baseCost": {
+                                        "type": "number"
+                                    },
+                                    "estimatedDays": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Trámite creado exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "409": {
+                        "description": "El slug ya está registrado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/procedures/{slug}": {
+            "get": {
+                "tags": [
+                    "Procedures"
+                ],
+                "summary": "Obtener un trámite por slug o ID",
+                "operationId": "900e3fc8f2533eab68a2fd586c4f9d76",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalle del trámite"
+                    },
+                    "404": {
+                        "description": "Trámite no encontrado"
+                    }
+                }
+            }
+        },
+        "/procedures/{id}": {
+            "put": {
+                "tags": [
+                    "Procedures"
+                ],
+                "summary": "Actualizar un tipo de trámite",
+                "operationId": "70654de8e3f3f40f85f07608ce7f6c4d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "slug": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "requirements": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "baseCost": {
+                                        "type": "number"
+                                    },
+                                    "estimatedDays": {
+                                        "type": "integer"
+                                    },
+                                    "isActive": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Trámite actualizado exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos para actualizar"
+                    },
+                    "404": {
+                        "description": "Trámite no encontrado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Procedures"
+                ],
+                "summary": "Desactivar un tipo de trámite",
+                "operationId": "a9ae1fcb44ee4f64b7847991450c7c0d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Trámite desactivado exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Trámite no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/requests": {
+            "post": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Crear (radicar) una nueva solicitud",
+                "operationId": "5ec6aa2a6af08e1745025d2d19cd8f13",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "procedureTypeId"
+                                ],
+                                "properties": {
+                                    "procedureTypeId": {
+                                        "type": "integer"
+                                    },
+                                    "notes": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Solicitud radicada exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/requests/my": {
+            "get": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Obtener las solicitudes del usuario autenticado",
+                "operationId": "d21cbbfefd0cefc44baab8c52cc7e68b",
+                "responses": {
+                    "200": {
+                        "description": "Lista de solicitudes del usuario"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/requests/tracking/{trackingNumber}": {
+            "get": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Consultar una solicitud por número de radicado",
+                "operationId": "45099a8c43db90f99e293b6387969604",
+                "parameters": [
+                    {
+                        "name": "trackingNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalle de la solicitud"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin acceso a la solicitud"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/requests/{id}/status": {
+            "patch": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Actualizar el estado de una solicitud",
+                "operationId": "37d42b8b6be44c348093370ec84214b0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "en_revision"
+                                    },
+                                    "comment": {
+                                        "type": "string"
+                                    },
+                                    "internalNotes": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Estado actualizado exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos para actualizar el estado"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/requests/{id}/assign": {
+            "patch": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Asignar una solicitud a un funcionario",
+                "operationId": "c7f7fb7a746fa11bb490ec2cee037f79",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "assignedTo": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Solicitud asignada exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos para asignar"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/requests/all": {
+            "get": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Obtener todas las solicitudes con filtros (staff)",
+                "operationId": "36f9801be5fdba142a3f2a8d8da9898b",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "priority",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "assignedTo",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "procedureTypeId",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de solicitudes"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin permisos para consultar todas las solicitudes"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/requests/assigned": {
+            "get": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Obtener las solicitudes asignadas al usuario autenticado",
+                "operationId": "4977e178dcc6440947165d91f40f24b8",
+                "responses": {
+                    "200": {
+                        "description": "Lista de solicitudes asignadas"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/requests/search-record": {
+            "post": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Buscar un trámite por número de radicado y documento",
+                "operationId": "4a267fe46371afb83107a3efa5dd1334",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "record_number",
+                                    "document_number"
+                                ],
+                                "properties": {
+                                    "record_number": {
+                                        "type": "string",
+                                        "example": "SGCM20260901ABC123"
+                                    },
+                                    "document_number": {
+                                        "type": "string",
+                                        "example": "1020304050"
+                                    },
+                                    "document_type": {
+                                        "type": "string",
+                                        "example": "CC"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Trámite encontrado"
+                    },
+                    "404": {
+                        "description": "Trámite no encontrado con esos datos"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/requests/my-procedures": {
+            "get": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Obtener los trámites del usuario autenticado",
+                "operationId": "319ec409b6c8ce96def1852caeb20d95",
+                "responses": {
+                    "200": {
+                        "description": "Lista de trámites del usuario"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/requests/my-procedures/{id}": {
+            "get": {
+                "tags": [
+                    "Requests"
+                ],
+                "summary": "Obtener el detalle de un trámite",
+                "operationId": "e2b0e0c90b0f7f6dd23819ba69556d23",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalle del trámite"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "Sin acceso al trámite"
+                    },
+                    "404": {
+                        "description": "Trámite no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/tourism-card/tariff": {
+            "get": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Obtener la tarifa activa de la tarjeta de turismo",
+                "operationId": "e67a5cdfaca2bf07edde1a9315365035",
+                "responses": {
+                    "200": {
+                        "description": "Tarifa activa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "concept": {
+                                            "type": "string"
+                                        },
+                                        "amount": {
+                                            "type": "number"
+                                        },
+                                        "currency": {
+                                            "type": "string"
+                                        },
+                                        "active": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No hay tarifa activa"
+                    }
+                }
+            }
+        },
+        "/tourism-card/quote": {
+            "post": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Cotizar el valor de la tarjeta de turismo",
+                "operationId": "3f0fbd599141754a088da693767665ed",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "birth_date",
+                                    "entry_date",
+                                    "return_date"
+                                ],
+                                "properties": {
+                                    "birth_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "entry_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "return_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "document_type": {
+                                        "type": "string"
+                                    },
+                                    "document_number": {
+                                        "type": "string"
+                                    },
+                                    "nationality": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cotización calculada"
+                    },
+                    "404": {
+                        "description": "No hay tarifa activa"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/tourism-card/card": {
+            "post": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Crear una solicitud de tarjeta de turismo",
+                "operationId": "27e05461a8fea8ec84fb2ea135830fe3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "document_type",
+                                    "document_number",
+                                    "email",
+                                    "phone",
+                                    "entry_date",
+                                    "return_date",
+                                    "accepted_terms"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "document_type": {
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "document_number": {
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "birth_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "nationality": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "country_residence": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "city_residence": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "emergency_contact_name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "emergency_contact_phone": {
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "entry_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "return_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "transport_type": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "airline_or_company": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "flight_number": {
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "origin_city": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "travel_reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "lodging_type": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "lodging_name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "lodging_address": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "lodging_sector": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "lodging_phone": {
+                                        "type": "string",
+                                        "maxLength": 50
+                                    },
+                                    "lodging_responsible_name": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "accepted_terms": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "accepted_location_consent": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Solicitud de tarjeta creada"
+                    },
+                    "400": {
+                        "description": "Debe aceptar términos y condiciones"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/tourism-card/card/{code}/payment/init": {
+            "post": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Inicializar el pago de la tarjeta de turismo",
+                "operationId": "3a59f5fe89357511ac0eab46e7f360bb",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "URL de pago generada"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    }
+                }
+            }
+        },
+        "/tourism-card/card/{code}/payment/status": {
+            "get": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Consultar el estado de pago de la tarjeta",
+                "operationId": "481506896812d923acf851104a33ff7b",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estado de pago actual"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    }
+                }
+            }
+        },
+        "/tourism-card/search": {
+            "post": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Buscar una tarjeta por código y documento",
+                "operationId": "39ac81e5336a82fb19687a83bca4bb47",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code",
+                                    "document_number"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "document_number": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tarjeta encontrada"
+                    },
+                    "404": {
+                        "description": "No se encontró registro con esos datos"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/tourism-card/card/{code}/receipt": {
+            "get": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Obtener el recibo de la tarjeta de turismo",
+                "operationId": "1778142a0daba3693c273163a18ebc31",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recibo de la tarjeta"
+                    },
+                    "404": {
+                        "description": "Recibo no encontrado"
+                    }
+                }
+            }
+        },
+        "/tourism-card/card/{code}/verify": {
+            "get": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Verificar la validez de una tarjeta de turismo",
+                "operationId": "761e1b67ee437f0dfae92ff1b8ffd631",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultado de verificación"
+                    },
+                    "404": {
+                        "description": "Código no válido"
+                    }
+                }
+            }
+        },
+        "/tourism-card/card/verify/qr/{qr_token}": {
+            "get": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Verificar una tarjeta mediante token QR",
+                "operationId": "e14713a5a4a3c1b3296b80abd129e2f2",
+                "parameters": [
+                    {
+                        "name": "qr_token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultado de verificación"
+                    },
+                    "404": {
+                        "description": "Código QR no válido"
+                    }
+                }
+            }
+        },
+        "/tourism-card/card/{code}/share-location": {
+            "post": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Registrar la ubicación del turista",
+                "operationId": "63a8b6d30d28101ce322218d6230de29",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number"
+                                    },
+                                    "longitude": {
+                                        "type": "number"
+                                    },
+                                    "accuracy": {
+                                        "type": "number"
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "captured_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ubicación registrada"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/tourism-card/payment/webhook": {
+            "post": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Webhook de confirmación de pago de la pasarela",
+                "description": "Webhook de la pasarela de pagos. Protegido con firma HMAC-SHA256\n(header X-Payment-Signature) vía middleware VerifyPaymentSignature.",
+                "operationId": "5693c06f1f49c18a36ffa75e84507d58",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "reference",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "reference": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    },
+                                    "gateway_response": {
+                                        "type": "object",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Webhook procesado"
+                    },
+                    "400": {
+                        "description": "Estado no permitido"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                }
+            }
+        },
+        "/tourism-card/expired/check": {
+            "post": {
+                "tags": [
+                    "TourismCard"
+                ],
+                "summary": "Marcar como vencidas las tarjetas expiradas",
+                "description": "Acción HTTP para el endpoint de mantenimiento /expired/check.\nDelega en el mismo proceso que ejecuta el scheduler. Devuelve el total\nde tarjetas marcadas como vencidas en esta pasada.",
+                "operationId": "7e6ada95193651de18189111ed20d7b4",
+                "responses": {
+                    "200": {
+                        "description": "Ejecución del proceso de vencimiento"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Mensaje de error"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Ingrese el token JWT obtenido en /auth/login",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Admin",
+            "description": "Admin"
+        },
+        {
+            "name": "Announcements",
+            "description": "Announcements"
+        },
+        {
+            "name": "Appointments",
+            "description": "Appointments"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Certificates",
+            "description": "Certificates"
+        },
+        {
+            "name": "Chat",
+            "description": "Chat"
+        },
+        {
+            "name": "Devices",
+            "description": "Devices"
+        },
+        {
+            "name": "Documents",
+            "description": "Documents"
+        },
+        {
+            "name": "Notifications",
+            "description": "Notifications"
+        },
+        {
+            "name": "Procedures",
+            "description": "Procedures"
+        },
+        {
+            "name": "Requests",
+            "description": "Requests"
+        },
+        {
+            "name": "TourismCard",
+            "description": "TourismCard"
+        }
+    ]
+}

@@ -1,0 +1,132 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Reportes" [totalCount]="reports.length + ' grupos'">
+    <div class="admin-content-inner">
+
+      <!-- HERO -->
+      <section class="pg-hero">
+        <div class="pg-hero-text">
+          <span class="pg-eyebrow">Inteligencia de datos</span>
+          <h1 class="pg-title">Reportes y KPIs</h1>
+          <p class="pg-sub">Cantidad de trámites, nivel de completitud y tiempos de respuesta agrupados por los criterios que elijas.</p>
+        </div>
+        <div class="pg-hero-chip">
+          <ion-icon name="bar-chart-outline"></ion-icon>
+          <div>
+            <span class="pg-chip-value">{{ summary.total }}</span>
+            <span class="pg-chip-label">trámites</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTERS -->
+      <section class="pg-toolbar">
+        <div class="filter-group">
+          <label>Agrupar por</label>
+          <select [(ngModel)]="groupBy" class="filter-input">
+            <option *ngFor="let opt of groupOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Desde</label>
+          <input type="date" [(ngModel)]="filterDateFrom" class="filter-input" />
+        </div>
+        <div class="filter-group">
+          <label>Hasta</label>
+          <input type="date" [(ngModel)]="filterDateTo" class="filter-input" />
+        </div>
+        <button class="btn btn-primary" (click)="applyFilters()">
+          <ion-icon name="funnel-outline"></ion-icon>Filtrar
+        </button>
+        <button class="btn btn-ghost" (click)="clearFilters()">Limpiar</button>
+      </section>
+
+      <!-- LOADING -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="occre-spinner"></div>
+        <p>Cargando reportes...</p>
+      </div>
+
+      <!-- ERROR -->
+      <div class="error-state" *ngIf="error && !isLoading">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <p>{{ error }}</p>
+        <button class="retry-btn" (click)="loadReports()">Reintentar</button>
+      </div>
+
+      <ng-container *ngIf="!isLoading && !error">
+
+        <!-- SUMMARY KPIS -->
+        <section class="pg-kpis">
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-primary"><ion-icon name="layers-outline"></ion-icon></div>
+            <div class="kpi-text">
+              <span class="kpi-value">{{ summary.total }}</span>
+              <span class="kpi-label">Trámites</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-success"><ion-icon name="checkmark-done-outline"></ion-icon></div>
+            <div class="kpi-text">
+              <span class="kpi-value">{{ summary.completed }}</span>
+              <span class="kpi-label">Completados</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-info"><ion-icon name="trending-up-outline"></ion-icon></div>
+            <div class="kpi-text">
+              <span class="kpi-value">{{ summary.success }}%</span>
+              <span class="kpi-label">% Éxito</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-warning"><ion-icon name="time-outline"></ion-icon></div>
+            <div class="kpi-text">
+              <span class="kpi-value">{{ summary.avgHours ? (summary.avgHours | number:'1.0-1') + ' h' : '—' }}</span>
+              <span class="kpi-label">Tiempo promedio</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- TABLE -->
+        <div class="data-card">
+          <div class="data-card-header" *ngIf="reports.length">
+            <h3>Detalle por {{ (groupLabels[groupBy] || 'categoría').toLowerCase() }}</h3>
+            <span class="data-card-hint">{{ reports.length }} grupo(s)</span>
+          </div>
+          <table *ngIf="reports.length">
+            <thead>
+              <tr>
+                <th>{{ groupLabels[groupBy] || 'Categoría' }}</th>
+                <th class="num-col">Cantidad</th>
+                <th class="num-col">Completados</th>
+                <th class="num-col">% Éxito</th>
+                <th class="num-col">Tiempo promedio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of reports">
+                <td>
+                  <div class="group-cell">
+                    <span class="group-dot"></span>
+                    <strong>{{ groupBy === 'status' ? getStatusLabel(r.label) : r.label }}</strong>
+                  </div>
+                </td>
+                <td class="num-col">{{ r.count }}</td>
+                <td class="num-col">{{ r.completed }}</td>
+                <td class="num-col">
+                  <span class="badge badge-success">{{ r.count > 0 ? ((r.completed / r.count) * 100 | number:'1.0-0') : 0 }}%</span>
+                </td>
+                <td class="num-col">{{ r.avg_hours ? r.avg_hours + ' h' : '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="empty-state" *ngIf="!reports.length">
+            <ion-icon name="bar-chart-outline"></ion-icon>
+            <p>No hay datos para los filtros seleccionados</p>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </app-admin-layout>
+</ion-content>

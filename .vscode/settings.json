@@ -1,0 +1,20 @@
+{
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "@ionic/angular/common",
+    "@ionic/angular/standalone"
+  ],
+  "js/ts.tsdk.path": "node_modules\\typescript\\lib",
+  "sqlTools.connections": [
+    {
+      "name": "SGCM (MySQL local)",
+      "driver": "MySQL",
+      "options": {
+        "host": "127.0.0.1",
+        "user": "root",
+        "password": "",
+        "port": 3306,
+        "database": "sgcm_db"
+      }
+    }
+  ]
+}

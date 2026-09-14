@@ -1,0 +1,232 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Mi Perfil">
+  <div class="admin-profile" *ngIf="!isLoading">
+
+    <!-- HERO -->
+    <section class="pg-hero">
+      <div class="pg-hero-text">
+        <span class="pg-eyebrow">Mi cuenta</span>
+        <h1 class="pg-title">Mi Perfil</h1>
+        <p class="pg-sub">{{ profile.email }}</p>
+      </div>
+      <div class="pg-hero-chip">
+        <span class="profile-avatar">{{ userInitials }}</span>
+        <div>
+          <span class="pg-chip-value">{{ profile.firstName }} {{ profile.lastName }}</span>
+          <span class="pg-chip-label">{{ roleLabels }}</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="success-message" *ngIf="successMessage">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage && !isChangingPassword && !isChangingEmail && !isEditing">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Personal Info -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h3>Información personal</h3>
+        <button *ngIf="!isEditing" class="section-btn" (click)="startEditing()">
+          <ion-icon name="create-outline"></ion-icon> Editar
+        </button>
+      </div>
+
+      <ng-container *ngIf="!isEditing">
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Nombre</span>
+            <span class="info-value">{{ profile.firstName }} {{ profile.lastName }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Correo</span>
+            <span class="info-value">{{ profile.email }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono</span>
+            <span class="info-value">{{ profile.phone || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Tipo de documento</span>
+            <span class="info-value">{{ profile.documentType || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Número de documento</span>
+            <span class="info-value">{{ profile.documentNumber || '—' }}</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="isEditing">
+        <div class="edit-form">
+          <div class="edit-field">
+            <label>Nombres</label>
+            <input type="text" [(ngModel)]="editForm.firstName" placeholder="Nombres" />
+          </div>
+          <div class="edit-field">
+            <label>Apellidos</label>
+            <input type="text" [(ngModel)]="editForm.lastName" placeholder="Apellidos" />
+          </div>
+          <div class="edit-field">
+            <label>Teléfono</label>
+            <input type="tel" [(ngModel)]="editForm.phone" placeholder="Teléfono" />
+          </div>
+          <div class="edit-field">
+            <label>Tipo de documento</label>
+            <select [(ngModel)]="editForm.documentType">
+              <option value="">Seleccionar</option>
+              <option *ngFor="let dt of documentTypes" [value]="dt.value">{{ dt.label }}</option>
+            </select>
+          </div>
+          <div class="edit-field">
+            <label>Número de documento</label>
+            <input type="text" [(ngModel)]="editForm.documentNumber" placeholder="Número de documento" />
+          </div>
+        </div>
+        <div class="error-message" *ngIf="errorMessage && isEditing">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-cancel" (click)="cancelEditing()" [disabled]="isSaving">Cancelar</button>
+          <button class="btn-save" (click)="saveProfile()" [disabled]="isSaving || !isFormValid">
+            {{ isSaving ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Change Email -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h3>Correo electrónico</h3>
+        <button *ngIf="!isChangingEmail" class="section-btn" (click)="startChangingEmail()">
+          <ion-icon name="mail-outline"></ion-icon> Cambiar
+        </button>
+      </div>
+
+      <ng-container *ngIf="!isChangingEmail">
+        <div class="info-grid">
+          <div class="info-item full">
+            <span class="info-label">Correo actual</span>
+            <span class="info-value">{{ profile.email }}</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="isChangingEmail">
+        <div class="edit-form">
+          <div class="edit-field">
+            <label>Correo actual</label>
+            <input type="email" [value]="profile.email" disabled class="disabled" />
+          </div>
+          <div class="edit-field">
+            <label>Nuevo correo electrónico</label>
+            <div class="password-wrapper">
+              <ion-icon class="field-icon" name="mail-outline"></ion-icon>
+              <input type="email" [(ngModel)]="emailForm.newEmail" placeholder="nuevo@correo.com" />
+            </div>
+          </div>
+          <div class="edit-field">
+            <label>Contraseña para confirmar</label>
+            <div class="password-wrapper">
+              <ion-icon class="field-icon" name="lock-closed-outline"></ion-icon>
+              <input [type]="showEmailPassword ? 'text' : 'password'" [(ngModel)]="emailForm.currentPassword" placeholder="Tu contraseña" />
+              <button type="button" class="toggle-pw" (click)="showEmailPassword = !showEmailPassword">
+                <ion-icon [name]="showEmailPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="error-message" *ngIf="errorMessage && isChangingEmail">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-cancel" (click)="cancelChangingEmail()" [disabled]="isSavingEmail">Cancelar</button>
+          <button class="btn-save" (click)="saveEmail()" [disabled]="isSavingEmail || !isEmailFormValid">
+            {{ isSavingEmail ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Change Password -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h3>Contraseña</h3>
+        <button *ngIf="!isChangingPassword" class="section-btn" (click)="startChangingPassword()">
+          <ion-icon name="lock-closed-outline"></ion-icon> Cambiar
+        </button>
+      </div>
+
+      <ng-container *ngIf="!isChangingPassword">
+        <div class="info-grid">
+          <div class="info-item full">
+            <span class="info-label">Contraseña</span>
+            <span class="info-value">••••••••</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="isChangingPassword">
+        <div class="edit-form">
+          <div class="edit-field">
+            <label>Contraseña actual</label>
+            <div class="password-wrapper">
+              <ion-icon class="field-icon" name="lock-closed-outline"></ion-icon>
+              <input [type]="showCurrentPassword ? 'text' : 'password'" [(ngModel)]="passwordForm.currentPassword" placeholder="Contraseña actual" />
+              <button type="button" class="toggle-pw" (click)="showCurrentPassword = !showCurrentPassword">
+                <ion-icon [name]="showCurrentPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+          </div>
+          <div class="edit-field">
+            <label>Nueva contraseña</label>
+            <div class="password-wrapper">
+              <ion-icon class="field-icon" name="lock-closed-outline"></ion-icon>
+              <input [type]="showNewPassword ? 'text' : 'password'" [(ngModel)]="passwordForm.newPassword" placeholder="Mínimo 6 caracteres" />
+              <button type="button" class="toggle-pw" (click)="showNewPassword = !showNewPassword">
+                <ion-icon [name]="showNewPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+          </div>
+          <div class="edit-field">
+            <label>Confirmar contraseña</label>
+            <div class="password-wrapper">
+              <ion-icon class="field-icon" name="lock-closed-outline"></ion-icon>
+              <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="passwordForm.confirmPassword" placeholder="Repetir contraseña" />
+              <button type="button" class="toggle-pw" (click)="showConfirmPassword = !showConfirmPassword">
+                <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+            <span class="field-hint" *ngIf="passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword">
+              Las contraseñas no coinciden
+            </span>
+          </div>
+        </div>
+        <div class="error-message" *ngIf="errorMessage && isChangingPassword">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-cancel" (click)="cancelChangingPassword()" [disabled]="isSavingPassword">Cancelar</button>
+          <button class="btn-save" (click)="savePassword()" [disabled]="isSavingPassword || !isPasswordFormValid">
+            {{ isSavingPassword ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="occre-spinner"></div>
+    <p>Cargando perfil...</p>
+  </div>
+</app-admin-layout>
+</ion-content>

@@ -1,0 +1,47 @@
+<ion-content [fullscreen]="true" class="welcome-page">
+  <main class="welcome-screen">
+    <figure class="welcome-background" aria-hidden="true">
+      <img
+        *ngFor="let slide of slides; let index = index"
+        [src]="slide.image"
+        [alt]="slide.alt"
+        class="welcome-background__image"
+        [class.is-first]="index === 0"
+        [class.is-second]="index === 1"
+        [class.is-third]="index === 2"
+      />
+    </figure>
+
+    <div class="welcome-overlay"></div>
+
+    <header class="welcome-header">
+      <img
+        src="assets/images/logo-occre.png"
+        [attr.alt]="'welcome.alt_logo' | translate"
+        class="welcome-logo"
+      />
+    </header>
+
+    <section class="welcome-content" aria-labelledby="welcome-title">
+      <h1 id="welcome-title">
+        <span class="welcome-title-line">{{ 'app.subtitle' | translate }}</span>
+        <span class="welcome-title-line">{{ 'app.name' | translate }}</span>
+      </h1>
+
+      <p>{{ 'app.tagline' | translate }}</p>
+    </section>
+
+    <button
+      type="button"
+      class="welcome-button occre-btn"
+      [attr.aria-label]="'welcome.aria_start' | translate"
+      [disabled]="isStarting"
+      [class.is-loading]="isStarting"
+      [class.occre-btn--loading]="isStarting"
+      (click)="startJourney()"
+    >
+      {{ 'welcome.start' | translate }}
+    </button>
+
+  </main>
+</ion-content>

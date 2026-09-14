@@ -1,0 +1,221 @@
+@use "./theme/buttons";
+
+@import "@ionic/angular/css/core.css";
+
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+* {
+  box-sizing: border-box;
+}
+
+/* Prevenir desbordamiento horizontal en cualquier pantalla móvil */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Contenedores flex/grid: no dejar que los hijos desborden el viewport */
+.flex-wrap,
+[class*='flex'],
+[class*='row'],
+[class*='grid'] {
+  max-width: 100%;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  font-family: var(--app-font-text);
+  color: var(--app-color-text);
+  background: var(--app-color-background);
+}
+
+body {
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-family: var(--app-font-title);
+}
+
+p,
+span,
+small,
+button,
+input,
+textarea,
+select,
+ion-label,
+ion-text {
+  font-family: var(--app-font-text);
+}
+
+button {
+  border: none;
+  outline: none;
+}
+
+.occre-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(var(--app-color-dark-rgb), 0.08);
+  border-top-color: var(--app-color-primary);
+  border-radius: 50%;
+  animation: occreSpin 800ms linear infinite;
+}
+
+@keyframes occreSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================================
+ * AJUSTES RESPONSIVE GLOBALES
+ * ========================================================= */
+
+/* Pantallas muy pequeñas (< 360px, ej. iPhone SE 1ª gen / 320px) */
+@media (max-width: 359px) {
+  html {
+    font-size: 14px;
+  }
+
+  ion-content {
+    --ion-safe-area-left: 0px;
+    --ion-safe-area-right: 0px;
+  }
+
+  .occre-btn--primary,
+  .occre-btn--dark {
+    min-height: 52px;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}
+
+/* Tablets pequeñas en orientación vertical / móviles anchos */
+@media (min-width: 600px) and (max-width: 900px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+/* Tablets grandes y pantallas medianas: limitar ancho de lectura */
+@media (min-width: 900px) {
+  ion-content > .inner-scroll,
+  ion-content {
+    --ion-content-max-width: 100%;
+  }
+}
+
+/* =========================================================
+ * SISTEMA RESPONSIVE MULTIPLATAFORMA (SGCM)
+ * ---------------------------------------------------------
+ * MÓVIL    : base (< 600px)
+ * TABLET   : 600px - 1023px  (punto medio 768px)
+ * DESKTOP  : >= 1024px       (tiers 1200, 1440, ultrawide >=1920)
+ *
+ * Mobile-first: los estilos base son móviles; las @media
+ * (min-width) solo añaden beneficios en pantallas grandes.
+ * ========================================================= */
+
+/* Contenedores de página: centrados con ancho máximo y gutters fluidos */
+.occre-container {
+  width: min(100% - 32px, 1440px);
+  margin-inline: auto;
+}
+
+.occre-container-lg {
+  width: min(100% - 40px, 1180px);
+  margin-inline: auto;
+}
+
+.occre-passage {
+  width: min(100% - 32px, 720px);
+  margin-inline: auto;
+}
+
+/* Grid adaptativo reutilizable (cards / listas) */
+.occre-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .occre-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .occre-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1920px) {
+  .occre-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Formularios: una sola columna en móvil, dos en desktop */
+.occre-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 16px;
+}
+
+@media (min-width: 768px) {
+  .occre-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* El color de cada icono depende del fondo sobre el que se apoya:
+ * blanco sobre fondos oscuros o degradados institucionales y color del
+ * tema sobre fondos claros. Cada componente define su color con las
+ * variables --app-* / --app-color-*. Aqui solo se garantiza que los
+ * iconos no colapsen ni deformen su tamano dentro de contenedores flex.
+ * La excepcion (iconos SIEMPRE azules) son los inputs de correo y
+ * contrasena de Login y Login Funcionario, definidos en sus SCSS. */
+ion-icon {
+  flex-shrink: 0;
+}
+
+/* Reducir animaciones si el usuario las desactiva por accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+

@@ -1,0 +1,160 @@
+<div class="chatbot-widget">
+  <section
+    class="chatbot-panel"
+    *ngIf="isOpen"
+    aria-label="Chat de orientación OCCRE"
+  >
+    <header class="chatbot-header">
+      <div class="chatbot-avatar">
+        <img
+          [src]="botAvatarUrl"
+          alt="Avatar de Miss Lorna"
+        />
+        <span class="chatbot-online-dot"></span>
+      </div>
+
+      <div class="chatbot-title">
+        <h2>{{ botName }}</h2>
+        <p>{{ botSubtitle }}</p>
+      </div>
+
+      <div class="chatbot-header-actions">
+        <button
+          type="button"
+          class="chatbot-clear"
+          aria-label="Limpiar conversación"
+          (click)="clearConversation()"
+        >
+          <ion-icon name="refresh-outline"></ion-icon>
+        </button>
+
+        <button
+          type="button"
+          class="chatbot-close"
+          aria-label="Cerrar chat"
+          (click)="closeChat()"
+        >
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+    </header>
+
+    <div
+      #messagesContainer
+      class="chatbot-body"
+    >
+      <div class="chatbot-disclaimer">
+        {{ 'chatbot.disclaimer' | translate }}
+      </div>
+
+      <div class="chatbot-messages">
+        <article
+          class="chatbot-message"
+          *ngFor="let message of messages; let last = last"
+          [class.user-message]="message.author === 'user'"
+          [class.bot-message]="message.author === 'bot'"
+        >
+          <span
+            class="message-avatar"
+            *ngIf="message.author === 'bot'"
+          >
+            <img
+              [src]="botAvatarUrl"
+              alt=""
+            />
+          </span>
+
+          <div class="message-bubble">
+            <p>{{ message.text | translate }}</p>
+
+            <button
+              *ngIf="message.sourceUrl"
+              type="button"
+              class="source-button"
+              (click)="openSource(message.sourceUrl)"
+            >
+              {{ message.sourceLabel || ('chatbot.source' | translate) }}
+              <ion-icon name="open-outline"></ion-icon>
+            </button>
+
+            <div
+              class="message-suggestions"
+              *ngIf="last && message.author === 'bot' && message.suggestions?.length"
+            >
+              <button
+                type="button"
+                *ngFor="let suggestion of message.suggestions"
+                (click)="askSuggestion(suggestion.value)"
+              >
+                <ion-icon name="sparkles-outline"></ion-icon>
+                {{ suggestion.label }}
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <div
+          class="chatbot-typing"
+          *ngIf="isTyping"
+          aria-label="Miss Lorna está escribiendo una respuesta"
+        >
+          <span class="typing-avatar">
+            <img [src]="botAvatarUrl" alt="" />
+          </span>
+          <div class="typing-dots">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form
+      class="chatbot-input"
+      (ngSubmit)="sendMessage()"
+    >
+      <input
+        type="text"
+        name="userQuestion"
+        [(ngModel)]="userQuestion"
+        placeholder="{{ 'chatbot.placeholder' | translate }}"
+        aria-label="{{ 'chatbot.placeholder' | translate }}"
+        autocomplete="off"
+        [disabled]="isTyping"
+      />
+
+      <button
+        type="submit"
+        aria-label="Enviar pregunta"
+        [class.is-typing]="isTyping"
+      >
+        <ion-icon name="send-outline"></ion-icon>
+      </button>
+    </form>
+
+    <footer class="chatbot-footer">
+      <ion-icon name="sparkles-outline"></ion-icon>
+      <span>{{ 'chatbot.footer' | translate }}</span>
+    </footer>
+  </section>
+
+  <button
+    type="button"
+    class="chatbot-toggle"
+    aria-label="Abrir chat OCCRE"
+    (click)="toggleChat()"
+  >
+    <span class="chatbot-toggle-avatar">
+      <img
+        [src]="botAvatarUrl"
+        alt="Miss Lorna"
+      />
+    </span>
+
+    <span class="chatbot-toggle-text">
+      <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      {{ 'chatbot.help' | translate }}
+    </span>
+  </button>
+</div>

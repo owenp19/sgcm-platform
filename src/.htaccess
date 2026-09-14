@@ -1,0 +1,42 @@
+# SGCM App - Angular SPA + Backend Laravel en Hostinger
+# El frontend vive en la raiz y el backend Laravel en /api (public -> api/public).
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # API Laravel (carpeta api/public)
+    RewriteRule ^api(/.*)?$ api/public$1 [L]
+
+    # SPA Angular: fallback a index.html
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.html [L]
+</IfModule>
+
+# Bloquear archivos ocultos y sensibles (.env, .git, etc.)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# index.html sin cache: evita bundles viejos tras un despliegue
+<FilesMatch "^index\.html$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+    </IfModule>
+</FilesMatch>
+
+# Assets con hash en el nombre: cache largo
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

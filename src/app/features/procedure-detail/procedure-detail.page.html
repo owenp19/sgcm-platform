@@ -1,0 +1,279 @@
+<ion-content [fullscreen]="true" class="pd-page">
+  <main class="pd-screen">
+    <!-- Loading -->
+    <ng-container *ngIf="isLoading">
+      <header class="pd-header pd-header--static">
+        <button
+          type="button"
+          class="pd-back-btn"
+          aria-label="{{ 'common.back' | translate }}"
+          (click)="goBack()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        <span class="pd-kicker">{{ 'procedure_detail.title' | translate }}</span>
+        <h1 class="pd-title pd-title--small">{{ 'procedure_detail.title' | translate }}</h1>
+      </header>
+
+      <div class="loading-container">
+        <div class="skeleton-block">
+          <ion-skeleton-text animated style="height: 24px; width: 50%; margin-bottom: 16px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height: 16px; width: 100%; margin-bottom: 8px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height: 16px; width: 80%; margin-bottom: 24px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height: 100px; width: 100%; border-radius: 12px; margin-bottom: 12px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height: 100px; width: 100%; border-radius: 12px"></ion-skeleton-text>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Error -->
+    <ng-container *ngIf="errorMessage && !isLoading">
+      <header class="pd-header pd-header--static">
+        <button
+          type="button"
+          class="pd-back-btn"
+          aria-label="{{ 'common.back' | translate }}"
+          (click)="goBack()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        <span class="pd-kicker">{{ 'procedure_detail.title' | translate }}</span>
+        <h1 class="pd-title pd-title--small">{{ 'procedure_detail.title' | translate }}</h1>
+      </header>
+
+      <div class="error-state">
+        <span class="error-state-icon">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+        </span>
+        <p>{{ errorMessage }}</p>
+        <button
+          type="button"
+          class="occre-btn occre-btn--outline"
+          (click)="loadDetail()"
+        >
+          <ion-icon name="reload-outline"></ion-icon>
+          <span>Intentar de nuevo</span>
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- Contenido -->
+    <ng-container *ngIf="procedure && !isLoading">
+      <header class="pd-header">
+        <button
+          type="button"
+          class="pd-back-btn"
+          aria-label="{{ 'common.back' | translate }}"
+          (click)="goBack()"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+
+        <span class="pd-header-icon">
+          <ion-icon [name]="statusService.getStatusIcon(procedure.status)"></ion-icon>
+        </span>
+
+        <span class="pd-kicker">{{ 'procedure_detail.title' | translate }}</span>
+        <h1 class="pd-title">{{ procedure.procedure_name }}</h1>
+
+        <span class="pd-record">{{ procedure.record_number }}</span>
+
+        <span class="pd-badge" [ngClass]="statusService.getStatusClass(procedure.status)">
+          <ion-icon [name]="statusService.getStatusIcon(procedure.status)"></ion-icon>
+          {{ procedure.status_label }}
+        </span>
+      </header>
+
+      <section class="pd-body">
+        <!-- Información del solicitante -->
+        <section class="pd-card info-card">
+          <div class="pd-card-title">
+            <span class="pd-card-title-icon">
+              <ion-icon name="person-outline"></ion-icon>
+            </span>
+            <h2>{{ 'procedure_detail.applicant' | translate }}</h2>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">{{ 'procedure_detail.applicant' | translate }}</span>
+            <span class="info-value">{{ procedure.applicant_name }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Documento</span>
+            <span class="info-value">{{ procedure.document_type }} {{ procedure.document_number }}</span>
+          </div>
+          <div class="info-row" *ngIf="procedure.email">
+            <span class="info-label">Correo</span>
+            <span class="info-value">{{ procedure.email }}</span>
+          </div>
+          <div class="info-row" *ngIf="procedure.phone">
+            <span class="info-label">Teléfono</span>
+            <span class="info-value">{{ procedure.phone }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Radicado</span>
+            <span class="info-value">{{ procedure.submitted_at | date:'dd/MM/yyyy hh:mm a' }}</span>
+          </div>
+          <div class="info-row" *ngIf="procedure.updated_at">
+            <span class="info-label">Última actualización</span>
+            <span class="info-value">{{ procedure.updated_at | date:'dd/MM/yyyy hh:mm a' }}</span>
+          </div>
+          <div class="info-row" *ngIf="procedure.office">
+            <span class="info-label">Sede</span>
+            <span class="info-value">{{ procedure.office }}</span>
+          </div>
+          <div class="info-row" *ngIf="procedure.assigned_to">
+            <span class="info-label">Funcionario</span>
+            <span class="info-value">{{ procedure.assigned_to }}</span>
+          </div>
+        </section>
+
+        <!-- Observaciones -->
+        <section class="pd-card" *ngIf="procedure.observations">
+          <div class="pd-card-title">
+            <span class="pd-card-title-icon">
+              <ion-icon name="information-circle-outline"></ion-icon>
+            </span>
+            <h2>{{ 'procedure_detail.observations' | translate }}</h2>
+          </div>
+          <p class="observations-text">{{ procedure.observations }}</p>
+        </section>
+
+        <!-- Historial -->
+        <section class="pd-card" *ngIf="procedure.timeline.length > 0">
+          <div class="pd-card-title">
+            <span class="pd-card-title-icon">
+              <ion-icon name="time-outline"></ion-icon>
+            </span>
+            <h2>{{ 'procedure_detail.history' | translate }}</h2>
+          </div>
+
+          <div class="timeline">
+            <div class="timeline-item" *ngFor="let event of procedure.timeline">
+              <div class="timeline-marker" [class.active]="event === procedure.timeline[procedure.timeline.length - 1]">
+                <div class="marker-dot"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-status">
+                  <span class="timeline-status-icon">
+                    <ion-icon [name]="statusService.getStatusIcon(event.status)"></ion-icon>
+                  </span>
+                  <strong>{{ statusService.getStatusLabel(event.status) || event.status }}</strong>
+                </div>
+                <p class="timeline-desc" *ngIf="event.description">{{ event.description }}</p>
+                <div class="timeline-meta">
+                  <span>{{ event.created_at | date:'dd/MM/yyyy hh:mm a' }}</span>
+                  <span *ngIf="event.user_name">— {{ event.user_name }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Documentos -->
+        <section class="pd-card" *ngIf="procedure.documents.length > 0">
+          <div class="pd-card-title">
+            <span class="pd-card-title-icon">
+              <ion-icon name="folder-open-outline"></ion-icon>
+            </span>
+            <h2>{{ 'procedure_detail.associated_docs' | translate }}</h2>
+          </div>
+
+          <div class="document-list">
+            <div class="document-item" *ngFor="let doc of procedure.documents">
+              <span class="doc-icon">
+                <ion-icon name="document-text-outline"></ion-icon>
+              </span>
+              <div class="doc-info">
+                <span class="doc-name">{{ doc.name }}</span>
+                <span
+                  class="doc-status"
+                  [class.received]="doc.is_validated"
+                  [class.pending]="!doc.is_validated"
+                >
+                  {{ doc.is_validated ? 'Recibido' : 'Pendiente' }}
+                </span>
+              </div>
+              <button
+                *ngIf="doc.is_validated"
+                type="button"
+                class="doc-action"
+                aria-label="Descargar documento"
+                (click)="downloadDocument(doc.id)"
+              >
+                <ion-icon name="download-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Citas asociadas -->
+        <section class="pd-card" *ngIf="procedure.appointments.length > 0">
+          <div class="pd-card-title">
+            <span class="pd-card-title-icon">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </span>
+            <h2>{{ 'procedure_detail.associated_appointments' | translate }}</h2>
+          </div>
+
+          <div class="appointment-list">
+            <div class="appointment-item" *ngFor="let apt of procedure.appointments">
+              <span class="apt-icon">
+                <ion-icon name="calendar-outline"></ion-icon>
+              </span>
+              <div class="apt-info">
+                <span class="apt-date">{{ apt.date | date:'dd/MM/yyyy' }} — {{ apt.time }}</span>
+                <span class="apt-office" *ngIf="apt.office">{{ apt.office }}</span>
+                <span class="apt-status">{{ apt.status }}</span>
+              </div>
+              <span class="apt-code" *ngIf="apt.code">
+                <small>{{ apt.code }}</small>
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Acciones -->
+        <section class="actions-section">
+          <button
+            *ngIf="procedure.actions.can_upload_corrections"
+            type="button"
+            class="occre-btn occre-btn--outline occre-btn--full action-btn"
+          >
+            <ion-icon name="create-outline"></ion-icon>
+            <span>{{ 'procedure_detail.correct_docs' | translate }}</span>
+          </button>
+
+          <button
+            *ngIf="procedure.actions.can_schedule_appointment"
+            type="button"
+            class="occre-btn occre-btn--outline occre-btn--full action-btn"
+            (click)="goToAppointment()"
+          >
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>{{ 'procedure_detail.schedule' | translate }}</span>
+          </button>
+
+          <button
+            *ngIf="procedure.actions.can_download_receipt"
+            type="button"
+            class="occre-btn occre-btn--outline occre-btn--full action-btn"
+            (click)="downloadReceipt()"
+          >
+            <ion-icon name="download-outline"></ion-icon>
+            <span>{{ 'procedure_detail.download_receipt' | translate }}</span>
+          </button>
+
+          <button
+            type="button"
+            class="occre-btn occre-btn--primary occre-btn--full action-btn"
+            (click)="contactSupport()"
+          >
+            <ion-icon name="call-outline"></ion-icon>
+            <span>{{ 'procedure_detail.contact_support' | translate }}</span>
+          </button>
+        </section>
+      </section>
+    </ng-container>
+  </main>
+</ion-content>

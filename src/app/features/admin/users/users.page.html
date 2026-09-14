@@ -1,0 +1,151 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Usuarios" [totalCount]="totalUsers + ' usuarios'">
+    <div class="admin-content-inner">
+
+      <!-- HERO -->
+      <section class="pg-hero">
+        <div class="pg-hero-text">
+          <span class="pg-eyebrow">Gestión de usuarios</span>
+          <h1 class="pg-title">Usuarios del sistema</h1>
+          <p class="pg-sub">Administra las cuentas, roles y acceso de las personas registradas en la plataforma.</p>
+        </div>
+        <div class="pg-hero-chip">
+          <ion-icon name="people-outline"></ion-icon>
+          <div>
+            <span class="pg-chip-value">{{ totalUsers }}</span>
+            <span class="pg-chip-label">cuentas</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTERS -->
+      <section class="pg-toolbar">
+        <div class="search-field">
+          <ion-icon name="search-outline"></ion-icon>
+          <input type="text" placeholder="Buscar por nombre, correo, documento o teléfono..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
+        </div>
+        <span class="toolbar-hint" *ngIf="searchTerm">{{ filteredUsers.length }} resultado(s)</span>
+      </section>
+
+      <!-- LOADING -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="occre-spinner"></div>
+        <p>Cargando usuarios...</p>
+      </div>
+
+      <!-- ERROR -->
+      <div class="error-state" *ngIf="error && !isLoading">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <p>{{ error }}</p>
+        <button class="retry-btn" (click)="loadUsers()">Reintentar</button>
+      </div>
+
+      <!-- TABLE -->
+      <ng-container *ngIf="!isLoading && !error">
+        <div class="data-card">
+          <table *ngIf="filteredUsers.length">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th>Documento</th>
+                <th>Roles</th>
+                <th>Registro</th>
+                <th class="actions-col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of filteredUsers">
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm">{{ getUserInitials(user) }}</div>
+                    <div>
+                      <p class="user-name">{{ user.firstName }} {{ user.lastName }}</p>
+                      <p class="user-phone" *ngIf="user.phone">{{ user.phone }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="email-cell">{{ user.email }}</td>
+                <td>
+                  <span *ngIf="user.documentNumber" class="doc-cell">{{ user.documentType }} {{ user.documentNumber }}</span>
+                  <span class="no-data" *ngIf="!user.documentNumber">—</span>
+                </td>
+                <td>
+                  <span class="role-badge" *ngFor="let role of user.roles || []"
+                    [class.role-admin]="role === 'admin'"
+                    [class.role-funcionario]="role === 'funcionario'"
+                    [class.role-ciudadano]="role === 'ciudadano'">
+                    {{ roleLabels[role] || role }}
+                  </span>
+                </td>
+                <td class="date-cell">{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
+                <td class="actions-col">
+                  <div class="icon-btns">
+                    <button class="icon-btn icon-btn-primary" (click)="openRoleEditor(user)" title="Cambiar roles">
+                      <ion-icon name="shield-outline"></ion-icon>
+                    </button>
+                    <button class="icon-btn icon-btn-danger" (click)="deleteUser(user)" title="Eliminar usuario"
+                      *ngIf="canDeleteUsers"
+                      [disabled]="isCurrentUser(user)">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="empty-state" *ngIf="!filteredUsers.length">
+            <ion-icon name="people-outline"></ion-icon>
+            <p>{{ searchTerm ? 'No se encontraron usuarios con ese criterio' : 'No hay usuarios registrados' }}</p>
+          </div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button class="pg-btn" [disabled]="currentPage === 1" (click)="loadUsers(currentPage - 1)">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+            <span class="pg-btn-label">Anterior</span>
+          </button>
+          <span class="pg-info">Página {{ currentPage }} de {{ totalPages }}</span>
+          <button class="pg-btn" [disabled]="currentPage >= totalPages" (click)="loadUsers(currentPage + 1)">
+            <span class="pg-btn-label">Siguiente</span>
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- ROLE EDIT MODAL -->
+    <ion-modal [isOpen]="isRoleModalOpen" (didDismiss)="closeRoleModal()" class="role-modal">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Roles · {{ editRolesUser?.firstName }} {{ editRolesUser?.lastName }}</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="closeRoleModal()">Cancelar</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <p class="modal-subtitle">Seleccione los roles que tendrá este usuario en la plataforma.</p>
+          <div class="role-list">
+            <button type="button" class="role-item" *ngFor="let role of availableRoles"
+              (click)="toggleRole(role)" [class.selected]="isRoleSelected(role)">
+              <ion-checkbox slot="start" [checked]="isRoleSelected(role)"></ion-checkbox>
+              <div class="role-item-text">
+                <strong>{{ roleLabels[role] }}</strong>
+                <span>{{ roleDescriptions[role] }}</span>
+              </div>
+            </button>
+          </div>
+          <div class="modal-actions">
+            <ion-button expand="block" (click)="saveRoles()" [disabled]="selectedRoles.length === 0">
+              Guardar cambios
+            </ion-button>
+          </div>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </app-admin-layout>
+</ion-content>

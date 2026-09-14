@@ -1,0 +1,347 @@
+<ion-content class="admin-page">
+  <app-admin-layout title="Dashboard" [totalCount]="stats ? (stats.requests.total | number) + ' trámites' : ''">
+    <div topbar-actions class="topbar-actions">
+      <button class="topbar-btn" (click)="exportExcel()" title="Exportar a Excel">
+        <ion-icon name="document-outline"></ion-icon>
+        <span class="topbar-btn-label">Excel</span>
+      </button>
+      <button class="topbar-btn" (click)="exportPdf()" title="Exportar a PDF">
+        <ion-icon name="print-outline"></ion-icon>
+        <span class="topbar-btn-label">PDF</span>
+      </button>
+  <button class="topbar-btn" (click)="capturePosition()" title="GPS de la visita / censo">
+    <ion-icon name="navigate-outline"></ion-icon>
+    <span class="topbar-btn-label">GPS</span>
+  </button>
+
+<button class="topbar-btn topbar-btn-primary" (click)="refresh()" [disabled]="isLoading" title="Actualizar">
+        <ion-icon name="refresh-outline" [class.spinning]="isLoading"></ion-icon>
+      </button>
+    </div>
+
+    <!-- HERO -->
+    <section class="db-hero">
+      <div class="db-hero-text">
+        <span class="db-eyebrow">Panel de control</span>
+        <h1 class="db-greeting">{{ greeting }}, {{ firstName }}</h1>
+        <p class="db-sub">Resumen general de la plataforma <strong>SGCM · OCCRE</strong></p>
+      </div>
+      <div class="db-hero-date">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <div class="db-hero-date-text">
+          <span class="db-hero-date-day">{{ todayLabel }}</span>
+          <span class="db-hero-date-update" *ngIf="lastUpdate">Actualizado {{ lastUpdate | date:'HH:mm' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOADING -->
+    <div class="loading-state" *ngIf="isLoading && !stats">
+      <div class="occre-spinner"></div>
+      <p>Cargando dashboard...</p>
+    </div>
+
+    <!-- ERROR -->
+    <div class="error-state" *ngIf="error && !isLoading">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="loadStats()">Reintentar</button>
+    </div>
+
+    <ng-container *ngIf="!isLoading || stats">
+
+      <!-- FILTERS -->
+      <section class="db-filters" *ngIf="stats">
+        <div class="db-filters-inner">
+          <div class="filter-group">
+            <label>Desde</label>
+            <input type="date" [(ngModel)]="filterDateFrom" class="filter-input" />
+          </div>
+          <div class="filter-group">
+            <label>Hasta</label>
+            <input type="date" [(ngModel)]="filterDateTo" class="filter-input" />
+          </div>
+          <div class="filter-group">
+            <label>Estado</label>
+            <select [(ngModel)]="filterStatus" class="filter-input">
+              <option value="">Todos</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="aprobado">Aprobado</option>
+              <option value="rechazado">Rechazado</option>
+            </select>
+          </div>
+          <button class="filter-btn apply" (click)="applyFilters()">Filtrar</button>
+          <button class="filter-btn clear" (click)="clearFilters()">Limpiar</button>
+        </div>
+        <span class="db-filters-icon"><ion-icon name="options-outline"></ion-icon></span>
+      </section>
+
+      <!-- ALERTS -->
+      <section class="db-alerts" *ngIf="stats?.alerts?.length">
+        <div class="alert-card" *ngFor="let alert of stats!.alerts" [class]="'alert-' + alert.type">
+          <div class="alert-icon">
+            <ion-icon [name]="getAlertIcon(alert.type)"></ion-icon>
+          </div>
+          <div class="alert-body">
+            <strong>{{ alert.title }}</strong>
+            <p>{{ alert.message }}</p>
+          </div>
+          <span class="alert-count">{{ alert.count }}</span>
+        </div>
+      </section>
+
+      <!-- KPI HERO CARDS -->
+      <section class="db-kpis" *ngIf="stats">
+        <app-stat-card
+          label="Solicitudes activas"
+          [value]="safeVal(stats.requests.activos)"
+          [subtitle]="safeVal(stats.requests.total) + ' en total'"
+          icon="clipboard-outline"
+          color="primary"
+          link="/admin/requests"
+          (cardClick)="onCardClick('/admin/requests')"
+          [loading]="isLoading">
+        </app-stat-card>
+
+        <app-stat-card
+          label="Documentos pendientes"
+          [value]="safeVal(stats.documents.pendientes)"
+          subtitle="Esperando validación"
+          icon="document-text-outline"
+          color="warning"
+          link="/admin/documents"
+          (cardClick)="onCardClick('/admin/documents')"
+          [loading]="isLoading">
+        </app-stat-card>
+
+        <app-stat-card
+          label="Citas agendadas"
+          [value]="safeVal(stats.appointments.total)"
+          [subtitle]="safeVal(stats.appointments.completadas) + ' completadas'"
+          icon="calendar-outline"
+          color="info"
+          link="/admin/appointments"
+          (cardClick)="onCardClick('/admin/appointments')"
+          [loading]="isLoading">
+        </app-stat-card>
+
+        <app-stat-card
+          label="Usuarios registrados"
+          [value]="safeVal(stats.users.total)"
+          [subtitle]="safeVal(stats.users.ciudadanos) + ' ciudadanos · ' + safeVal(stats.activeFuncionarios) + ' funcionarios'"
+          icon="people-outline"
+          color="success"
+          link="/admin/users"
+          (cardClick)="onCardClick('/admin/users')"
+          [loading]="isLoading">
+        </app-stat-card>
+      </section>
+
+      <!-- MINI STATS -->
+      <section class="db-mini-stats" *ngIf="stats">
+        <div class="mini-stat" (click)="onCardClick('/admin/documents')">
+          <div class="mini-stat-icon stat-primary"><ion-icon name="document-outline"></ion-icon></div>
+          <div class="mini-stat-info">
+            <span class="mini-stat-value">{{ safeVal(stats.documents.total) }}</span>
+            <span class="mini-stat-label">Documentos cargados</span>
+          </div>
+        </div>
+        <div class="mini-stat" (click)="onCardClick('/admin/documents')">
+          <div class="mini-stat-icon stat-success"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
+          <div class="mini-stat-info">
+            <span class="mini-stat-value">{{ safeVal(stats.documents.validados) }}</span>
+            <span class="mini-stat-label">Documentos validados</span>
+          </div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-icon stat-success"><ion-icon name="trending-up-outline"></ion-icon></div>
+          <div class="mini-stat-info">
+            <span class="mini-stat-value">{{ safeVal(stats.requests.aprobados) }}</span>
+            <span class="mini-stat-label">Solicitudes aprobadas</span>
+          </div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-icon stat-info"><ion-icon name="flag-outline"></ion-icon></div>
+          <div class="mini-stat-info">
+            <span class="mini-stat-value">{{ safeVal(stats.requests.finalizados) }}</span>
+            <span class="mini-stat-label">Solicitudes finalizadas</span>
+          </div>
+        </div>
+        <div class="mini-stat" (click)="onCardClick('/admin/requests')">
+          <div class="mini-stat-icon stat-danger"><ion-icon name="close-circle-outline"></ion-icon></div>
+          <div class="mini-stat-info">
+            <span class="mini-stat-value">{{ safeVal(stats.requests.rechazados) }}</span>
+            <span class="mini-stat-label">Solicitudes rechazadas</span>
+          </div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-icon stat-warning"><ion-icon name="people-outline"></ion-icon></div>
+          <div class="mini-stat-info">
+            <span class="mini-stat-value">{{ safeVal(stats.activeFuncionarios) }}</span>
+            <span class="mini-stat-label">Funcionarios activos</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHARTS -->
+      <section class="db-charts" *ngIf="stats && !isLoading">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Documentos por estado</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="chart-docs-status" #chartCanvas></canvas>
+            <div class="chart-empty" *ngIf="!stats.documentsByStatus?.length">
+              <p>Sin datos de documentos</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <h3>Documentos cargados por mes</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="chart-docs-month" #chartCanvas></canvas>
+            <div class="chart-empty" *ngIf="!stats.documentsByMonth?.length">
+              <p>Sin datos mensuales</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Solicitudes por estado</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="chart-requests-status" #chartCanvas></canvas>
+            <div class="chart-empty" *ngIf="!stats.requestsByStatus?.length">
+              <p>Sin solicitudes</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Usuarios registrados</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="chart-users-month" #chartCanvas></canvas>
+            <div class="chart-empty" *ngIf="!stats.usersByMonth?.length">
+              <p>Sin registros mensuales</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <h3>Citas por día</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="chart-appointments" #chartCanvas></canvas>
+            <div class="chart-empty" *ngIf="!stats.appointmentsByDay?.length">
+              <p>Sin citas registradas</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Solicitudes por mes</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="chart-requests-month" #chartCanvas></canvas>
+            <div class="chart-empty" *ngIf="!stats.monthlyStats?.length">
+              <p>Sin solicitudes mensuales</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Trámites más solicitados</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="chart-top-procedures" #chartCanvas></canvas>
+            <div class="chart-empty" *ngIf="!stats.topProcedures?.length">
+              <p>Sin trámites registrados</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TABLES -->
+      <div class="db-tables" *ngIf="stats && !isLoading">
+        <section class="table-section">
+          <div class="section-header">
+            <h3>Últimas solicitudes</h3>
+            <button class="section-link" (click)="navigateTo('solicitudes')">Ver todas</button>
+          </div>
+          <div class="table-wrapper">
+            <table *ngIf="stats.recentRequests?.length">
+              <thead>
+                <tr>
+                  <th>Radicado</th>
+                  <th>Trámite</th>
+                  <th>Ciudadano</th>
+                  <th>Estado</th>
+                  <th>Prioridad</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let req of stats.recentRequests">
+                  <td class="tracking-cell">{{ req.trackingNumber }}</td>
+                  <td>{{ req.procedureName }}</td>
+                  <td>{{ req.citizenName }}</td>
+                  <td>
+                    <span class="status-badge {{ getStatusClass(req.status) }}">{{ getStatusLabel(req.status) }}</span>
+                  </td>
+                  <td>
+                    <span class="priority-badge priority-{{ req.priority }}">{{ req.priority }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="empty-state" *ngIf="!stats.recentRequests?.length">
+              <ion-icon name="clipboard-outline"></ion-icon>
+              <p>No hay solicitudes recientes</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="table-section">
+          <div class="section-header">
+            <h3>Actividad reciente</h3>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item" *ngFor="let act of stats.recentActivity">
+              <div class="activity-icon" [class]="'act-' + act.type">
+                <ion-icon [name]="getActivityIcon(act.type)"></ion-icon>
+              </div>
+              <div class="activity-info">
+                <p class="activity-desc">
+                  <strong>{{ act.userName }}</strong>
+                  <span *ngIf="act.type === 'request'">creó solicitud</span>
+                  <span *ngIf="act.type === 'document'">subió documento</span>
+                  <span *ngIf="act.type === 'appointment'">agendó cita</span>
+                </p>
+                <p class="activity-meta">{{ act.code }}</p>
+              </div>
+              <span class="activity-time">{{ act.createdAt | date:'short' }}</span>
+            </div>
+            <div class="empty-state" *ngIf="!stats.recentActivity?.length">
+              <ion-icon name="time-outline"></ion-icon>
+              <p>Sin actividad reciente</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </ng-container>
+  </app-admin-layout>
+
+
+  <!-- Chatbot OCCRE (Gemini) para orientar al funcionario -->
+  <app-occre-chatbot></app-occre-chatbot>
+
+</ion-content>
