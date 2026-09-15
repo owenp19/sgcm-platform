@@ -491,7 +491,7 @@ button {
   width: 100%;
   max-width: 1180px;
   margin: 28px auto 0;
-  padding: 0 14px 34px;
+  padding: 0 14px 0;
   display: grid;
   gap: 30px;
 }
@@ -873,6 +873,9 @@ button {
 }
 
 .bottom-menu-end {
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
   margin-top: 4px;
 }
 
@@ -972,7 +975,7 @@ button {
 
   .home-body {
     margin-top: 32px;
-    padding: 0 24px 42px;
+    padding: 0 24px 0;
   }
 
   .data-protection-card {

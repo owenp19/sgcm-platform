@@ -427,6 +427,27 @@ cd android
 
 Requisitos previos: `ANDROID_HOME` y `JAVA_HOME` apuntando al Android SDK y JDK 21. El APK debug usa el keystore de debug (instalable en cualquier dispositivo). Para Play Store se requiere `assembleRelease` con un keystore propio.
 
+### APK de prueba (release)
+
+El APK de prueba firmado más reciente está disponible en:
+
+```
+apk/my-occre-app.apk
+```
+
+Se regenera con:
+
+```bash
+npm run build
+npx cap sync android
+cd android
+.\gradlew.bat assembleRelease
+# Copiar el resultado a apk/:
+Copy-Item app\build\outputs\apk\release\app-release.apk ..\apk\my-occre-app.apk
+```
+
+Es instalable en cualquier dispositivo Android (permite instalar desde fuentes desconocidas) y usa el keystore `occre-release.jks`.
+
 Los iconos y la splash se generan desde `assets/` con `npx capacitor-assets generate --android`.
 
 ---
