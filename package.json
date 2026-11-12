@@ -6,6 +6,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "serve": "ng serve",
     "start:tunnel": "ng serve --configuration tunnel",
     "dev": "concurrently \"npm start\" \"cd backend && php artisan serve --host=127.0.0.1 --port=8000\"",
     "dev:tunnel": "concurrently \"npm run start:tunnel\" \"cd backend && php artisan serve --host=127.0.0.1 --port=8000\"",
@@ -50,6 +51,7 @@
     "chart.js": "^4.5.1",
     "ionicons": "^7.0.0",
     "leaflet": "^1.9.4",
+    "mini-css-extract-plugin": "^2.9.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -66,6 +68,7 @@
     "@angular/language-service": "^20.0.0",
     "@capacitor/assets": "^3.0.5",
     "@ionic/angular-toolkit": "^12.0.0",
+    "@playwright/test": "^1.65.0",
     "@types/leaflet": "^1.9.22",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",

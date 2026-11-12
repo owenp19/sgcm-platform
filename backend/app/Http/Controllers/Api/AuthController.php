@@ -9,10 +9,12 @@ use App\Models\User;
 use App\Models\UserPreference;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -177,6 +179,52 @@ class AuthController extends Controller
         ]);
     }
 
+    #[OA\Post(
+        path: '/auth/refresh',
+        summary: 'Renovar el token JWT antes de que expire',
+        tags: ['Auth'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Token renovado'),
+            new OA\Response(response: 401, description: 'Token no válido o expirado'),
+        ]
+    )]
+    public function refresh(): JsonResponse
+    {
+        try {
+            $token = auth('api')->refresh();
+        } catch (JWTException) {
+            return response()->json(['error' => 'Token no válido o expirado'], 401);
+        }
+
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => (int) config('jwt.ttl', 60) * 60,
+        ]);
+    }
+
+    #[OA\Post(
+        path: '/auth/logout',
+        summary: 'Cerrar la sesión actual e invalidar el token JWT',
+        tags: ['Auth'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Sesión cerrada'),
+            new OA\Response(response: 401, description: 'No autenticado'),
+        ]
+    )]
+    public function logout(): JsonResponse
+    {
+        try {
+            auth('api')->logout();
+        } catch (JWTException) {
+            // El token ya estaba expirado o invalidado: la sesión sigue cerrada.
+        }
+
+        return response()->json(['message' => 'Sesión cerrada exitosamente']);
+    }
+
     #[OA\Get(
         path: '/auth/profile',
         summary: 'Obtener el perfil del usuario autenticado',
@@ -335,15 +383,18 @@ class AuthController extends Controller
 
         $resetToken = Str::uuid()->toString();
 
+        // Se almacena solo el hash del token: una filtración de la tabla no
+        // permite reutilizar el enlace de recuperación.
         $user->forceFill([
-            'reset_token' => $resetToken,
+            'reset_token' => hash('sha256', $resetToken),
             'reset_token_expires' => now()->addHour(),
         ])->save();
 
         $frontend = rtrim((string) config('services.frontend_url', 'http://localhost:8100'), '/');
         $resetUrl = $frontend.'/reset-password?token='.$resetToken;
 
-        \Illuminate\Support\Facades\Log::info("[Password Reset] Link para {$user->email}: {$resetUrl}");
+        // Nunca registrar el token ni el enlace completo en los logs.
+        \Illuminate\Support\Facades\Log::info('[Password Reset] Solicitud generada', ['user_id' => $user->id]);
 
         if (config('mail.mailers.smtp.host') && config('mail.from.address')) {
             // Envío asíncrono: no bloquea la respuesta HTTP del usuario.
@@ -388,7 +439,7 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:6'],
         ]);
 
-        $user = User::where('reset_token', $data['token'])
+        $user = User::where('reset_token', hash('sha256', $data['token']))
             ->where('reset_token_expires', '>', now())
             ->first();
 
@@ -401,6 +452,11 @@ class AuthController extends Controller
             'reset_token' => null,
             'reset_token_expires' => null,
         ])->save();
+
+        // Revoca todos los JWT emitidos antes del restablecimiento.
+        Cache::forever("auth.tokens_revoked_before.{$user->id}", now()->timestamp);
+
+        AuditLog::record($user->id, 'reset_password', 'user', $user->id);
 
         return response()->json(['message' => 'Contraseña restablecida exitosamente']);
     }
@@ -441,6 +497,16 @@ class AuthController extends Controller
         }
 
         $user->update(['password' => Hash::make($data['newPassword'])]);
+
+        // Revoca todos los JWT emitidos antes del cambio; la sesión actual
+        // también queda invalidada y el usuario debe iniciar sesión de nuevo.
+        Cache::forever("auth.tokens_revoked_before.{$user->id}", now()->timestamp);
+
+        try {
+            auth('api')->invalidate();
+        } catch (JWTException) {
+            // Si el token ya no es válido, la revocación por caché sigue vigente.
+        }
 
         AuditLog::record($user->id, 'change_password', 'user', $user->id);
 
@@ -581,10 +647,21 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             'roles' => ['required', 'array'],
-            'roles.*' => ['string'],
+            'roles.*' => ['string', 'exists:roles,name'],
         ]);
 
+        /** @var User $authUser */
+        $authUser = $request->user();
         $user = User::findOrFail($userId);
+
+        // Un funcionario no puede conceder ni retirar el rol de administrador
+        // (evita escalada de privilegios dentro del área de usuarios).
+        if (! $authUser->hasRole('admin')) {
+            $targetIsAdmin = $user->roles()->where('name', 'admin')->exists();
+            if (in_array('admin', $data['roles'], true) || $targetIsAdmin) {
+                return response()->json(['error' => 'Solo un administrador puede gestionar el rol de administrador'], 403);
+            }
+        }
 
         DB::transaction(function () use ($user, $data) {
             $user->roles()->detach();

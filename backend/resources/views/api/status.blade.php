@@ -348,27 +348,24 @@
             </section>
         </div>
 
-        <p class="section-title">Actividad en la plataforma</p>
-        <div class="stats">
-            @forelse ($counts as $stat)
-                <div class="stat">
-                    <div class="num">{{ number_format($stat['count']) }}</div>
-                    <div class="lbl">{{ $stat['label'] }}</div>
-                    <div class="bar"><span style="width: {{ min(100, max(4, $stat['count'] * 4)) }}%"></span></div>
-                </div>
-            @empty
-                <div class="stat">
-                    <div class="lbl">Sin datos disponibles</div>
-                    <div class="bar"></div>
-                </div>
-            @endforelse
-        </div>
+        @if (! empty($counts))
+            <p class="section-title">Actividad en la plataforma</p>
+            <div class="stats">
+                @foreach ($counts as $stat)
+                    <div class="stat">
+                        <div class="num">{{ number_format($stat['count']) }}</div>
+                        <div class="lbl">{{ $stat['label'] }}</div>
+                        <div class="bar"><span style="width: {{ min(100, max(4, $stat['count'] * 4)) }}%"></span></div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
 
         <div class="banner">
             <div class="banner-inner">
                 <div>
                     <h3>Documentacion interactiva</h3>
-                    <p>Explora y prueba los {{ count($counts) ? 'principales' : '' }} endpoints de la API con Swagger UI.</p>
+                    <p>Explora y prueba los endpoints de la API con Swagger UI.</p>
                 </div>
                 <a class="btn" href="{{ $docsUrl }}">Abrir Swagger UI &rarr;</a>
             </div>

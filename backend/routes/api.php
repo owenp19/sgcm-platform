@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 // Health check (usado por el frontend para verificar conectividad).
 // JSON para la app (Accept: application/json) y pagina HTML para navegadores.
-Route::get('/health', [HealthController::class, 'health']);
+Route::get('/health', [HealthController::class, 'health'])->middleware('throttle:api');
 
 // Auth
 Route::prefix('auth')->group(function () {
@@ -33,7 +33,9 @@ Route::prefix('auth')->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:auth');
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:auth');
 
-    Route::middleware(['auth:api', 'throttle:api'])->group(function () {
+    Route::middleware(['auth:api', 'jwt.fresh', 'throttle:api'])->group(function () {
+        Route::post('/refresh', [AuthController::class, 'refresh']);
+        Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/profile', [AuthController::class, 'getProfile']);
         Route::put('/profile', [AuthController::class, 'updateProfile']);
         Route::put('/photo', [AuthController::class, 'uploadPhoto']);
@@ -48,7 +50,7 @@ Route::prefix('auth')->group(function () {
 });
 
 // Notifications
-Route::prefix('notifications')->middleware(['auth:api', 'throttle:api'])->group(function () {
+Route::prefix('notifications')->middleware(['auth:api', 'jwt.fresh', 'throttle:api'])->group(function () {
     Route::get('/', [NotificationController::class, 'getNotifications']);
     Route::get('/unread-count', [NotificationController::class, 'getUnreadCount']);
     Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
@@ -62,7 +64,7 @@ Route::prefix('procedures')->group(function () {
     Route::get('/', [ProcedureController::class, 'getAll']);
     Route::get('/{slug}', [ProcedureController::class, 'getBySlug']);
 
-    Route::middleware(['auth:api', 'role:admin'])->group(function () {
+    Route::middleware(['auth:api', 'jwt.fresh', 'role:admin'])->group(function () {
         Route::post('/', [ProcedureController::class, 'create']);
         Route::put('/{id}', [ProcedureController::class, 'update']);
         Route::delete('/{id}', [ProcedureController::class, 'remove']);
@@ -71,9 +73,9 @@ Route::prefix('procedures')->group(function () {
 
 // Requests (radicados)
 Route::prefix('requests')->group(function () {
-    Route::post('/search-record', [RequestController::class, 'searchRecord']);
+    Route::post('/search-record', [RequestController::class, 'searchRecord'])->middleware('throttle:api');
 
-    Route::middleware(['auth:api', 'throttle:api'])->group(function () {
+    Route::middleware(['auth:api', 'jwt.fresh', 'throttle:api'])->group(function () {
         Route::post('/', [RequestController::class, 'create']);
         Route::get('/my', [RequestController::class, 'getMyRequests']);
         Route::get('/my-procedures', [RequestController::class, 'getMyProcedures']);
@@ -87,7 +89,7 @@ Route::prefix('requests')->group(function () {
 });
 
 // Documents
-Route::prefix('documents')->middleware(['auth:api', 'throttle:api'])->group(function () {
+Route::prefix('documents')->middleware(['auth:api', 'jwt.fresh', 'throttle:api'])->group(function () {
     Route::post('/upload', [DocumentController::class, 'upload']);
     Route::get('/{id}/download', [DocumentController::class, 'download']);
     Route::patch('/{id}/validate', [DocumentController::class, 'validateDocument'])->middleware('role:funcionario,admin');
@@ -96,7 +98,7 @@ Route::prefix('documents')->middleware(['auth:api', 'throttle:api'])->group(func
 
 // Admin
 Route::prefix('admin')->group(function () {
-    Route::middleware(['auth:api', 'role:admin,funcionario', 'throttle:api'])->group(function () {
+    Route::middleware(['auth:api', 'jwt.fresh', 'role:admin,funcionario', 'throttle:api'])->group(function () {
         Route::get('/dashboard', [AdminController::class, 'getDashboardStats']);
         Route::get('/reports', [AdminController::class, 'getReports']);
         Route::get('/export/excel', [AdminController::class, 'exportExcel']);
@@ -108,7 +110,7 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::get('/audit-log', [AdminController::class, 'getAuditLog'])
-        ->middleware(['auth:api', 'role:admin', 'throttle:api']);
+        ->middleware(['auth:api', 'jwt.fresh', 'role:admin', 'throttle:api']);
 });
 
 // Appointments (citas)
@@ -117,7 +119,7 @@ Route::prefix('appointments')->group(function () {
     Route::get('/offices', [AppointmentController::class, 'getOffices']);
     Route::get('/availability', [AppointmentController::class, 'getAvailability'])->middleware('throttle:api');
 
-    Route::middleware(['auth:api', 'throttle:api'])->group(function () {
+    Route::middleware(['auth:api', 'jwt.fresh', 'throttle:api'])->group(function () {
         Route::post('/', [AppointmentController::class, 'create']);
         Route::get('/my', [AppointmentController::class, 'getMyAppointments']);
         Route::get('/all', [AppointmentController::class, 'getAllAppointments'])->middleware('role:admin,funcionario');
@@ -127,7 +129,7 @@ Route::prefix('appointments')->group(function () {
 });
 
 // Devices (push tokens)
-Route::prefix('devices')->middleware(['auth:api', 'throttle:api'])->group(function () {
+Route::prefix('devices')->middleware(['auth:api', 'jwt.fresh', 'throttle:api'])->group(function () {
     Route::post('/register', [DeviceController::class, 'register']);
     Route::post('/unregister', [DeviceController::class, 'unregister']);
     Route::get('/my', [DeviceController::class, 'myDevices']);
@@ -137,7 +139,7 @@ Route::prefix('devices')->middleware(['auth:api', 'throttle:api'])->group(functi
 Route::prefix('announcements')->group(function () {
     Route::get('/active', [AnnouncementController::class, 'getActive']);
 
-    Route::middleware(['auth:api', 'role:admin'])->group(function () {
+    Route::middleware(['auth:api', 'jwt.fresh', 'role:admin'])->group(function () {
         Route::get('/', [AnnouncementController::class, 'getAll']);
         Route::post('/', [AnnouncementController::class, 'create']);
         Route::put('/{id}', [AnnouncementController::class, 'update']);
@@ -147,9 +149,9 @@ Route::prefix('announcements')->group(function () {
 
 // Certificates (constancias PDF+QR)
 Route::prefix('certificates')->group(function () {
-    Route::post('/validate-qr', [CertificateController::class, 'validateQr']);
+    Route::post('/validate-qr', [CertificateController::class, 'validateQr'])->middleware('throttle:api');
     Route::get('/generate/{trackingNumber}', [CertificateController::class, 'generate'])
-        ->middleware('auth:api');
+        ->middleware(['auth:api', 'jwt.fresh']);
 });
 
 // Tourism card (tarjeta de turismo)
@@ -159,7 +161,7 @@ Route::prefix('tourism-card')->group(function () {
     Route::post('/card', [TourismCardController::class, 'create'])->middleware('throttle:tourism-card');
     Route::post('/card/{code}/payment/init', [TourismCardController::class, 'initPayment'])->middleware('throttle:tourism-card');
     Route::get('/card/{code}/payment/status', [TourismCardController::class, 'checkPaymentStatus'])->middleware('throttle:api');
-    Route::get('/card/{code}/receipt', [TourismCardController::class, 'getReceipt'])->middleware('throttle:api');
+    Route::get('/card/{code}/receipt', [TourismCardController::class, 'getReceipt'])->middleware('throttle:tourism-card');
     Route::get('/card/{code}/verify', [TourismCardController::class, 'verifyCard'])->middleware('throttle:api');
     Route::post('/card/{code}/share-location', [TourismCardController::class, 'shareLocation'])->middleware('throttle:tourism-card');
     Route::get('/card/verify/qr/{qr_token}', [TourismCardController::class, 'verifyByQrToken'])->middleware('throttle:api');
@@ -167,9 +169,9 @@ Route::prefix('tourism-card')->group(function () {
     Route::post('/payment/webhook', [TourismCardController::class, 'paymentWebhook'])
         ->middleware(\App\Http\Middleware\VerifyPaymentSignature::class);
     Route::post('/expired/check', [TourismCardController::class, 'updateCardStatusExpired'])
-        ->middleware('auth:api');
+        ->middleware(['auth:api', 'jwt.fresh']);
 });
 
 // Chat (Miss Lorna)
 Route::post('/chat', [ChatController::class, 'chat'])
-    ->middleware(['auth:api', 'throttle:chat']);
+    ->middleware(['auth:api', 'jwt.fresh', 'throttle:chat']);

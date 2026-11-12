@@ -287,6 +287,12 @@ class RequestController extends Controller
             return response()->json(['error' => 'Solicitud no encontrada'], 404);
         }
 
+        // Evita conflicto de interés: un funcionario/admin no puede resolver
+        // o aprobar una solicitud radicada por él mismo.
+        if ($req->user_id === $user->id) {
+            return response()->json(['error' => 'No puedes cambiar el estado de tu propia solicitud'], 403);
+        }
+
         $fromStatus = $req->status;
         $status = $data['status'];
 

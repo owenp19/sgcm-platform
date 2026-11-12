@@ -302,7 +302,7 @@ class AppointmentController extends Controller
             new OA\Response(response: 404, description: 'Cita no encontrada'),
         ]
     )]
-    public function getAppointmentByCode(string $code): JsonResponse
+    public function getAppointmentByCode(Request $request, string $code): JsonResponse
     {
         $a = Appointment::query()
             ->leftJoin('offices as o', 'appointments.office_id', '=', 'o.id')
@@ -314,6 +314,12 @@ class AppointmentController extends Controller
 
         if (! $a) {
             return response()->json(['error' => 'Cita no encontrada'], 404);
+        }
+
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        if ($a->user_id !== $user->id && ! $user->hasRole('admin', 'funcionario')) {
+            return response()->json(['error' => 'No tienes acceso a esta cita'], 403);
         }
 
         $documents = AppointmentDocument::where('appointment_id', $a->id)
@@ -457,8 +463,7 @@ class AppointmentController extends Controller
         $rows = $query->orderBy('appointments.scheduled_date')
             ->orderBy('appointments.scheduled_time')
             ->select('appointments.*', 'o.name as office_name', 's.name as service_name', 's.icon as service_icon',
-                \Illuminate\Support\Facades\DB::raw("CONCAT(u.first_name, ' ', u.last_name) as citizen_name"),
-                'u.email as citizen_email', 'u.phone as citizen_phone')
+                \Illuminate\Support\Facades\DB::raw("CONCAT(u.first_name, ' ', u.last_name) as citizen_name"))
             ->get();
 
         return response()->json([
@@ -466,8 +471,6 @@ class AppointmentController extends Controller
                 'id' => $a->id,
                 'code' => $a->appointment_code,
                 'citizenName' => $a->citizen_name,
-                'citizenEmail' => $a->citizen_email,
-                'citizenPhone' => $a->citizen_phone,
                 'serviceName' => $a->service_name,
                 'serviceIcon' => $a->service_icon,
                 'officeName' => $a->office_name,

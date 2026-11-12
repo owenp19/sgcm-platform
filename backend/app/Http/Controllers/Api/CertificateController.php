@@ -61,13 +61,18 @@ class CertificateController extends Controller
             ], 400);
         }
 
-        $qrData = json_encode([
-            'type' => 'occre_certificate',
+        $payload = [
+            'type' => 'occre_certificate_v2',
             'tracking' => $req->tracking_number,
             'status' => $req->status,
             'citizen' => "{$req->first_name} {$req->last_name}",
             'doc' => (($req->document_type ?? '').' '.($req->document_number ?? '')),
             'procedure' => $req->procedure_name,
+        ];
+
+        $qrData = json_encode([
+            ...$payload,
+            'signature' => hash_hmac('sha256', json_encode($payload), (string) config('app.key')),
             'issued' => now()->toISOString(),
         ]);
 
@@ -121,21 +126,69 @@ class CertificateController extends Controller
             return response()->json(['error' => 'Formato QR inválido', 'valid' => false], 400);
         }
 
-        if (($parsed['type'] ?? '') !== 'occre_certificate') {
+        $qrType = $parsed['type'] ?? 'v1_legacy';
+        $isV2 = $qrType === 'occre_certificate_v2';
+
+        if (! $isV2 && $qrType !== 'occre_certificate') {
             return response()->json(['error' => 'QR inválido o no corresponde a SGCM'], 400);
         }
 
         $req = ServiceRequest::query()
             ->join('procedure_types as pt', 'requests.procedure_type_id', '=', 'pt.id')
             ->join('users as u', 'requests.user_id', '=', 'u.id')
-            ->where('requests.tracking_number', $parsed['tracking'] ?? '')
+            ->where('requests.tracking_number', is_string($parsed['tracking'] ?? null) ? $parsed['tracking'] : '')
             ->select('requests.tracking_number', 'requests.status', 'requests.submitted_at', 'requests.resolved_at',
+                'u.first_name', 'u.last_name', 'u.document_type', 'u.document_number',
                 'pt.name as procedure_name',
                 \Illuminate\Support\Facades\DB::raw("CONCAT(u.first_name, ' ', u.last_name) as citizen_name"))
             ->first();
 
-        if (! $req) {
+        // Una constancia solo es válida si el trámite fue aprobado o finalizado.
+        if (! $req || ! in_array($req->status, ['aprobado', 'finalizado'], true)) {
             return response()->json(['error' => 'Solicitud no encontrada', 'valid' => false], 404);
+        }
+
+        $payload = [
+            'type' => 'occre_certificate',
+            'tracking' => $req->tracking_number,
+            'status' => $req->status,
+            'citizen' => "{$req->first_name} {$req->last_name}",
+            'doc' => (($req->document_type ?? '').' '.($req->document_number ?? '')),
+            'procedure' => $req->procedure_name,
+        ];
+
+        $payload = [
+            'type' => 'occre_certificate_v2',
+            'tracking' => $req->tracking_number,
+            'status' => $req->status,
+            'citizen' => "{$req->first_name} {$req->last_name}",
+            'doc' => (($req->document_type ?? '').' '.($req->document_number ?? '')),
+            'procedure' => $req->procedure_name,
+        ];
+
+        $fieldsOk = ($parsed['status'] ?? null) === $payload['status']
+            && ($parsed['citizen'] ?? null) === $payload['citizen']
+            && ($parsed['doc'] ?? null) === $payload['doc']
+            && ($parsed['procedure'] ?? null) === $payload['procedure'];
+
+        $expectedSignature = hash_hmac('sha256', json_encode($payload), (string) config('app.key'));
+        $hasSignature = is_string($parsed['signature'] ?? null) && $parsed['signature'] !== '';
+        $signatureOk = $hasSignature && hash_equals($expectedSignature, $parsed['signature']);
+
+        // QR v2: firma HMAC obligatoria. No se acepta modo legacy.
+        if ($isV2 && ! $signatureOk) {
+            return response()->json(['error' => 'QR inválido o no corresponde a SGCM', 'valid' => false], 400);
+        }
+
+        // QR v1 (legacy): compatibilidad con constancias emitidas antes de la firma.
+        // Se exige que los datos visibles coincidan con el trámite; la firma es opcional.
+        if (! $isV2 && ! $fieldsOk) {
+            return response()->json(['error' => 'QR inválido o no corresponde a SGCM', 'valid' => false], 400);
+        }
+
+        // QR v2: además de la firma, los datos visibles deben coincidir.
+        if ($isV2 && ! $fieldsOk) {
+            return response()->json(['error' => 'QR inválido o no corresponde a SGCM', 'valid' => false], 400);
         }
 
         return response()->json([

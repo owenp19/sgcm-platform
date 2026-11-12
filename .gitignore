@@ -72,3 +72,21 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# --- Seguridad OCCRE: credenciales y secretos (NO subir a GitHub) ---
+backend/.env
+backend/.env.testing
+backend/.env.production
+
+# --- Archivos de respaldo y configuración innecesarios (no son parte del producto) ---
+*.backup.before-*
+package-lock.json.backup.before-*
+package.json.backup.before-*
+opencode.json.backup.before-*
+
+# --- Configuración interna de OpenCode (agente, no del proyecto) ---
+.opencode/
+opencode.json
+
+# --- Directorios temporales ---
+temp-aas/

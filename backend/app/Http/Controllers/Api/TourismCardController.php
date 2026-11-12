@@ -44,7 +44,9 @@ class TourismCardController extends Controller
         $attempts = 0;
 
         do {
-            $code = sprintf('SGCM-TT-%d-%06d', $year, random_int(0, 999999));
+            // 12 caracteres aleatorios (≈62^12) en lugar de 6 dígitos:
+            // el código del recibo es un secreto de acceso a datos personales.
+            $code = sprintf('SGCM-TT-%d-%s', $year, Str::upper(Str::random(12)));
             $exists = TouristCard::where('code', $code)->exists();
             if (++$attempts > 100) {
                 throw new \RuntimeException('No se pudo generar un código único después de 100 intentos');
@@ -52,6 +54,97 @@ class TourismCardController extends Controller
         } while ($exists);
 
         return $code;
+    }
+
+    /**
+     * Los códigos antiguos (6 dígitos u otros formatos) son enumerables y no
+     * deben servir por sí solos para divulgar datos personales.
+     */
+    private function isHighEntropyCode(string $code): bool
+    {
+        return (bool) preg_match('/^SGCM-TT-\d{4}-[A-Z0-9]{12}$/', $code);
+    }
+
+    /**
+     * Credencial firmada de acceso al recibo. Se entrega al crear la tarjeta y
+     * permite consultar el recibo sin depender de la entropía del código.
+     */
+    private function receiptAccessToken(TouristCard $card): string
+    {
+        $payload = $card->id.'.'.$card->code.'.'.now()->addDays(30)->timestamp;
+        $signature = hash_hmac('sha256', $payload, (string) config('app.key'));
+
+        return rtrim(strtr(base64_encode($payload.'.'.$signature), '+/', '-_'), '=');
+    }
+
+    private function hasValidReceiptToken(?string $token, TouristCard $card): bool
+    {
+        if (! is_string($token) || $token === '') {
+            return false;
+        }
+
+        $decoded = base64_decode(strtr($token, '-_', '+/'), true);
+        if ($decoded === false) {
+            return false;
+        }
+
+        $parts = explode('.', $decoded);
+        if (count($parts) !== 4) {
+            return false;
+        }
+
+        [$id, $code, $expiresAt, $signature] = $parts;
+        $payload = $id.'.'.$code.'.'.$expiresAt;
+        $expected = hash_hmac('sha256', $payload, (string) config('app.key'));
+
+        return hash_equals($expected, $signature)
+            && (int) $expiresAt >= now()->timestamp
+            && (int) $id === (int) $card->id
+            && $code === $card->code;
+    }
+
+    private function requestingStaff(Request $request): bool
+    {
+        if (! $request->bearerToken()) {
+            return false;
+        }
+
+        try {
+            $user = auth('api')->user();
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return $user !== null && $user->hasRole('admin', 'funcionario');
+    }
+
+    private function maskName(?string $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        return mb_substr($value, 0, 1).str_repeat('*', max(2, mb_strlen($value) - 1));
+    }
+
+    private function maskEmail(?string $value): string
+    {
+        if ($value === null || $value === '' || ! str_contains($value, '@')) {
+            return '***';
+        }
+
+        [$local, $domain] = explode('@', $value, 2);
+
+        return mb_substr($local, 0, 1).'***@'.$domain;
+    }
+
+    private function maskTail(?string $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        return str_repeat('*', max(2, mb_strlen($value) - 2)).mb_substr($value, -2);
     }
 
     #[OA\Get(
@@ -238,6 +331,7 @@ class TourismCardController extends Controller
             'data' => [
                 'id' => $card->id,
                 'code' => $card->code,
+                'receipt_token' => $this->receiptAccessToken($card),
                 'payment_status' => 'Pendiente',
                 'card_status' => 'Pendiente de pago',
                 'amount' => $amount,
@@ -369,7 +463,7 @@ class TourismCardController extends Controller
             new OA\Response(response: 404, description: 'Recibo no encontrado'),
         ]
     )]
-    public function getReceipt(string $code): JsonResponse
+    public function getReceipt(Request $request, string $code): JsonResponse
     {
         $card = TouristCard::where('code', $code)
             ->with(['receipts' => fn ($q) => $q->latest('id')->limit(1)])
@@ -381,7 +475,13 @@ class TourismCardController extends Controller
 
         $receipt = $card->receipts->first();
 
-        return response()->json([
+        // Acceso completo: staff autenticado, código de alta entropía o
+        // credencial firmada entregada al crear la tarjeta.
+        $fullAccess = $this->requestingStaff($request)
+            || $this->isHighEntropyCode($card->code)
+            || $this->hasValidReceiptToken($request->query('token'), $card);
+
+        $data = [
             'code' => $card->code,
             'receipt_number' => $receipt?->receipt_number,
             'pdf_path' => $receipt?->pdf_path,
@@ -416,7 +516,30 @@ class TourismCardController extends Controller
             'payment_status' => $card->payment_status,
             'card_status' => $card->card_status,
             'created_at' => $card->created_at?->toISOString(),
-        ]);
+            'pii_masked' => ! $fullAccess,
+        ];
+
+        if (! $fullAccess) {
+            // Nunca devolver el QR ni la ruta del PDF en modo restringido:
+            // ambos pueden contener el token que da acceso a los datos.
+            $data['pdf_path'] = null;
+            $data['qr_payload'] = null;
+            $data['first_name'] = $this->maskName($card->first_name);
+            $data['last_name'] = $this->maskName($card->last_name);
+            $data['document_number'] = $this->maskTail($card->document_number);
+            $data['birth_date'] = null;
+            $data['country_residence'] = $card->country_residence ? '***' : null;
+            $data['city_residence'] = $card->city_residence ? '***' : null;
+            $data['email'] = $this->maskEmail($card->email);
+            $data['phone'] = $this->maskTail($card->phone);
+            $data['emergency_contact_name'] = $this->maskName($card->emergency_contact_name);
+            $data['emergency_contact_phone'] = $this->maskTail($card->emergency_contact_phone);
+            $data['lodging_address'] = $card->lodging_address ? '***' : null;
+            $data['lodging_phone'] = $this->maskTail($card->lodging_phone);
+            $data['lodging_responsible_name'] = $this->maskName($card->lodging_responsible_name);
+        }
+
+        return response()->json($data);
     }
 
     #[OA\Get(
@@ -481,18 +604,19 @@ class TourismCardController extends Controller
         $isExpired = $card->expires_at !== null && $card->expires_at->lt(now());
         $isValid = $card->payment_status === 'Pagado' && ! $isExpired;
 
+        $docNumber = (string) $card->document_number;
+        $hiddenDoc = strlen($docNumber) > 4
+            ? str_repeat('*', strlen($docNumber) - 4).substr($docNumber, -4)
+            : '****'.substr($docNumber, -2);
+
+        // No se exponen nombres completos ni documento sin máscara por validación QR pública.
         return response()->json([
             'code' => $card->code,
-            'first_name' => $card->first_name,
-            'last_name' => $card->last_name,
-            'document_type' => $card->document_type,
-            'document_number' => $card->document_number,
+            'document' => "{$card->document_type} {$hiddenDoc}",
             'status' => $isExpired ? 'Vencida' : $card->card_status,
             'payment_status' => $card->payment_status,
             'entry_date' => $card->entry_date?->toDateString(),
             'return_date' => $card->return_date?->toDateString(),
-            'issued_at' => $card->issued_at?->toISOString(),
-            'expires_at' => $card->expires_at?->toISOString(),
             'valid' => $isValid,
             'message' => $isValid ? 'Documento válido' : 'Documento vencido o no pagado',
         ]);
@@ -526,9 +650,9 @@ class TourismCardController extends Controller
     public function shareLocation(Request $request, string $code): JsonResponse
     {
         $data = $request->validate([
-            'latitude' => ['nullable', 'numeric'],
-            'longitude' => ['nullable', 'numeric'],
-            'accuracy' => ['nullable', 'numeric'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'accuracy' => ['nullable', 'numeric', 'min:0'],
             'reason' => ['nullable', 'string', 'max:100'],
             'captured_at' => ['nullable', 'date'],
         ]);

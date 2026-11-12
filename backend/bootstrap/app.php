@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => RoleMiddleware::class,
+            'jwt.fresh' => \App\Http\Middleware\RejectRevokedTokens::class,
         ]);
 
         // API pura: nunca redirigir a rutas web; siempre 401 JSON

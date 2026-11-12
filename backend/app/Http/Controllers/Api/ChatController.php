@@ -89,7 +89,7 @@ class ChatController extends Controller
 
             return response()->json(['error' => $msg], 502);
         } catch (\Throwable $e) {
-            Log::error('[Chat] Error: '.$e->getMessage());
+            Log::error('[Chat] Error de conexión con el asistente');
 
             return response()->json(['error' => 'Error de conexión con el asistente. Intenta de nuevo.'], 502);
         }
