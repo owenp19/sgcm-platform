@@ -42,7 +42,7 @@ test.describe('Navegación OCCRE', () => {
     await expect(page.locator('ion-content')).toBeVisible();
     await page.locator('.register-btn').click();
     await expect(page).toHaveURL('/register');
-    await expect(page.locator('ion-content')).toBeVisible();
+    await expect(page.locator("ion-input[autocomplete='given-name']")).toBeVisible();
   });
 
   test('navega de login a la tarjeta de turismo (acceso visitante)', async ({
@@ -53,7 +53,7 @@ test.describe('Navegación OCCRE', () => {
     await expect(page.locator('ion-content')).toBeVisible();
     await page.locator('.visitor-access-btn').click();
     await expect(page).toHaveURL('/tarjeta-turismo');
-    await expect(page.locator('ion-content')).toBeVisible();
+    await expect(page.locator('ion-content.tourism-page')).toBeVisible();
   });
 
   test('la ruta pública de búsqueda de registros es accesible', async ({ page }) => {

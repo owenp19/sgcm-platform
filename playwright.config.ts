@@ -9,9 +9,11 @@ import { defineConfig, devices } from '@playwright/test';
  *    lo reutiliza (`reuseExistingServer: true`) y NO lo detiene.
  *  - Si no, arranca `npm start` (`ng serve`) y lo detiene al terminar.
  *
- * Chromium se ejecuta en modo headed por defecto para permitir la inspección
- * visual de la aplicación. Para ejecución headless (CI) usar:
- *   npx playwright test --headless
+ * Por defecto las pruebas E2E automatizadas corren en modo headless
+ * (estable y rápido). Para inspección visual manual de la aplicación, usar:
+ *   npx playwright test --headed
+ * o sobrescribir: npx playwright test --config playwright.config.ts
+ * (headless: false en `use` permite abrir el navegador visible).
  */
 
 export default defineConfig({
@@ -22,21 +24,20 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
-  timeout: 90000, // Margen para el teardown del contexto (Service Worker de PWA)
+  timeout: 120000, // Margen para el teardown del contexto (PWA + Service Worker)
   reporter: process.env.CI ? 'github' : 'list',
 
   use: {
     baseURL: 'http://localhost:8100',
     browserName: 'chromium',
-    headless: false, // Modo headed para inspección visual de la aplicación
-    channel: 'chrome',
+    headless: true, // Pruebas automatizadas estables y rápidas. Usa --headed para inspección visual manual.
     viewport: { width: 375, height: 667 }, // Móvil por defecto (Ionic)
     ignoreHTTPSErrors: true,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
     actionTimeout: 10000,
-    navigationTimeout: 30000,
+    navigationTimeout: 60000,
     launchOptions: {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     },
@@ -53,7 +54,7 @@ export default defineConfig({
     command: 'npm start',
     port: 8100,
     reuseExistingServer: true,
-    timeout: 180000,
+    timeout: 240000, // Build en frío de Angular 20 + Ionic 8 (~3-4 min)
     alreadyRunningError: '',
   },
 });

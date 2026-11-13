@@ -5,6 +5,12 @@
 - FASE 1: auditoría backend/API/MySQL en curso; dependencias Laravel restauradas y verificadas (`composer install --dry-run` sin cambios).
 - Entorno: PHP 8.2.12, Composer 2.8.8, Laravel 12.67.0, Angular 20, Ionic 8, Capacitor 8, MySQL.
 - BD de pruebas aislada: `occre_test_db` (usuario `occre_test`, privilegios solo sobre esa BD). Tests de seguridad con `DatabaseTransactions` sobre MySQL; suite completa 16 pruebas / 29 aserciones en verde.
+- Playwright 1.65.0 instalado como devDependency (`@playwright/test`) con Chromium 1254 verificado (ejecutable en AppData\Local\ms-playwright).
+- playwright.config.ts en raíz del proyecto (webServer reutiliza `npm start` en puerto 8100, headless por defecto para E2E, `--headed` para inspección manual).
+- 20 pruebas E2E creadas en docs/auditoria-visual/playwright/ (helpers.ts, navigation.test.ts, forms.test.ts, responsive.test.ts, screenshots.test.ts): 20/20 pasando.
+- 4 capturas de pantalla generadas en docs/auditoria-visual/playwright/screenshots/ (bienvenida, login, tarjeta-turismo, busqueda-registros).
+- MCP de Playwright ya configurado en opencode.json (npx @playwright/mcp@latest, enabled) — no duplicado.
+- `npm run dev` verificado funcionando: frontend (ng serve, puerto 8100) + backend (php artisan serve, puerto 8000).
 - Vulnerabilidades corregidas y con retest: escalada de rol (funcionario→admin), IDOR de citas y documentos, conflicto de interés en `updateStatus`, rate limit en búsqueda pública/QR/health, hash del token de recuperación y eliminación del token en logs, firma HMAC + validación de estado/datos en QR de constancias, mayor entropía en códigos de tarjeta turística y throttle específico en recibo.
 - Dependencias remediadas: `composer.lock` actualizado (Laravel 12.70.2, Symfony 7.4.x); `composer audit` sin advisories; `composer install --dry-run` sin cambios.
 - PII en recibo turístico: acceso completo solo para staff, código de alta entropía o token HMAC firmado; códigos antiguos devuelven datos enmascarados y sin QR/PDF.
@@ -27,6 +33,15 @@
 - Auditoría integral completada (2026-11-12): 36 hallazgos documentados (3 críticas, 7 altas, 11 medias, 7 bajas, 8 preventivas); 15 vulnerabilidades ya corregidas en historial.
 - Informes de auditoría en `docs/security-audit/` (14 documentos).
 - Hallazgos críticos pendientes de autorización: exposición PII en `/tourism-card/search`, JWT en localStorage, APP_DEBUG=true.
+
+## Limpieza y optimización (ejecutada - 2026-11-12)
+- `.angular/cache/` — Eliminado (caché de compilación Angular, regenerable, ~50-100 MB recuperados)
+- `temp-aas/` — Eliminado (directorio temporal, confirmado vacío)
+- `storage/framework/cache/data/*` — Limpiado (caché de datos Laravel, regenerable)
+- `storage/framework/views/*.php` — Limpiado (vistas Blade compiladas, regenerables)
+- `storage/framework/cache/data/.gitignore` — Restaurado (eliminado accidentalmente durante limpieza, recuperado)
+- No se tocaron: `.env`, migraciones, datos de ciudadanos, backups reales, Skills, MCP, AGENTS.md, memoria persistente, pruebas de seguridad, archivos lock, `www/`, logs, sesiones de Laravel
+- Eliminados adicionalmente: `opencode.json.backup.before-skill-orchestrator`, `package-lock.json.backup.before-concurrently-fix`, `package-lock.json.backup.before-npm-ci`, `package.json.backup.before-concurrently-fix`, `package.json.backup.before-npm-ci`, y los 5 archivos `.backup.before-*` de controladores (backups pre-auditoría innecesarios)
 
 ## Sistema de Skills (implementado - Fase 0/1 completo)
 - Configuración global en `C:\Users\Owen\.config\opencode\opencode.jsonc` con campos `instructions` y `skills`

@@ -16,6 +16,7 @@
 | Sistema de Backups y Recuperación OCCRE | IMPLEMENTADO | docs/backups/ (5 docs), scripts/backup/ (3 scripts), scripts/restore/ (1 doc). Prueba de restauración exitosa en BD temporal. Pruebas de seguridad 31/31 en verde. |
 | composer update (CVEs) | COMPLETADO | `composer audit` sin advisories |
 | mitigación PII recibo turístico | COMPLETADO | Token HMAC + enmascarado para códigos antiguos |
+| Playwright + pruebas E2E OCCRE | COMPLETADO | Playwright 1.65.0 + Chromium 1254 instalados; playwright.config.ts configurado; 20 pruebas E2E (20/20 pasando) en docs/auditoria-visual/playwright/; 4 capturas de pantalla en docs/auditoria-visual/playwright/screenshots/; MCP ya en opencode.json (no duplicado); `npm run dev` verificado funcionando |
 
 ## Checkpoint 2026-10-28
 - Verificado: vendor coincide con `composer.lock`; `composer audit` con 12 advisories (7 paquetes).
@@ -37,4 +38,25 @@
 - No se modificó diseño visual ni interfaz durante la auditoría
 - No se ejecutaron operaciones destructivas; no se modificaron datos reales de ciudadanos
 - Próximo paso: obtener autorización para correcciones críticas (exposición PII en endpoints públicos, JWT en localStorage, APP_DEBUG=true)
+
+## Checkpoint 2026-11-12 (Limpieza)
+- Limpieza de proyecto ejecutada (operaciones autorizadas únicamente)
+- `.angular/cache/` eliminado (~50-100 MB recuperados)
+- `temp-aas/` eliminado (confirmado vacío)
+- `storage/framework/cache/data/*` limpiado (caché Laravel, regenerable)
+- `storage/framework/views/*.php` limpiado (vistas compiladas, regenerables)
+- `storage/framework/cache/data/.gitignore` restaurado (eliminado accidentalmente, recuperado)
+- No se tocaron: .env, migraciones, backups reales, www/, logs, sesiones, dependencias, composer.json, package.json
+- Eliminados adicionalmente: todos los archivos `.backup.before-*` (17 archivos): opencode.json.backup.before-skill-orchestrator, package-lock.json.backup.before-concurrently-fix, package-lock.json.backup.before-npm-ci, package.json.backup.before-concurrently-fix, package.json.backup.before-npm-ci, y 5 backups de controladores Laravel
+- Validación: archivos principales Angular y rutas API verificados; MySQL no disponible en entorno (preexistente); pruebas de seguridad no ejecutables (timeout phpunit por falta de MySQL)
+- Informe de limpieza: docs/security-audit/15-auditoria-limpieza.md
+
+## Checkpoint 2026-11-12 (Playwright E2E)
+- Playwright 1.65.0 + Chromium 1254 instalados y verificados (devDependency, ejecutable en AppData\Local\ms-playwright)
+- playwright.config.ts en raíz: webServer reutiliza `npm start` (puerto 8100), headless por defecto para E2E, `--headed` para inspección visual manual
+- 20 pruebas E2E creadas en docs/auditoria-visual/playwright/ (helpers.ts, navigation.test.ts, forms.test.ts, responsive.test.ts, screenshots.test.ts): 20/20 pasando
+- 4 capturas de pantalla en docs/auditoria-visual/playwright/screenshots/ (bienvenida, login, tarjeta-turismo, busqueda-registros)
+- MCP de Playwright ya en opencode.json (npx @playwright/mcp@latest, enabled) — no duplicado
+- `npm run dev` verificado funcionando (frontend 8100 + backend 8000)
+- No se modificó la interfaz gráfica ni lógica institucional
 
